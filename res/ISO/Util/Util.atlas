@@ -1,0 +1,40 @@
+Util.png
+size: 127, 93
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+BlueprintBG
+  rotate: false
+  xy: 85, 8
+  size: 34, 17
+  orig: 34, 17
+  offset: 0, 0
+  index: -1
+Error-Small
+  rotate: false
+  xy: 85, 36
+  size: 34, 17
+  orig: 34, 17
+  offset: 0, 0
+  index: -1
+Error
+  rotate: false
+  xy: 8, 8
+  size: 66, 33
+  orig: 66, 33
+  offset: 0, 0
+  index: -1
+Highlight-Small
+  rotate: false
+  xy: 85, 64
+  size: 34, 17
+  orig: 34, 17
+  offset: 0, 0
+  index: -1
+Highlight
+  rotate: false
+  xy: 8, 52
+  size: 66, 33
+  orig: 66, 33
+  offset: 0, 0
+  index: -1
