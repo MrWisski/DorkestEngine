@@ -73,20 +73,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Coding\CPP_DEV_LIBS\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\inc;C:\Coding\CPP_DEV_LIBS\olcPixelGameEngine-master;C:\Coding\CPP_DEV_LIBS\entt-master\src;C:\Coding\CPP_DEV_LIBS\glew-2.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\Win32;C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
     <SourcePath>C:\Coding\CPP\DarkestEngine\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\lib\glew-2.1.0\include;C:\Coding\CPP\DarkestEngine\inc;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\Win32;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Coding\CPP\DarkestEngine\inc;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master;C:\Coding\CPP\DarkestEngine\lib\glew-2.1.0\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Coding\CPP\DarkestEngine\inc;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master;C:\Coding\CPP\DarkestEngine\lib\glew-2.1.0\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,12 +126,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,14 +142,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -168,7 +174,7 @@
   <ItemGroup>
     <ClInclude Include="inc\ECS\components.h" />
     <ClInclude Include="inc\ECS\dorkestBaseEntity.h" />
-    <ClInclude Include="inc\ECS\Scene.h" />
+    <ClInclude Include="inc\ECS\dorkestScene.h" />
     <ClInclude Include="inc\ECS\Systems\RenderSystem.h" />
     <ClInclude Include="inc\Engine.h" />
     <ClInclude Include="inc\instPGE.h" />

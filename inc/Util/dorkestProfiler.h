@@ -81,6 +81,19 @@ public:
 		return dorkestProfiler::instance;
 	}
 
+	/// <summary>
+	/// Returns reports of all tags available.
+	/// </summary>
+	/// <returns>A string containing the report of ALL tags we have.</returns>
+	std::string viewAllPoints() {
+		std::stringstream ss;
+		ss << std::endl;
+		for (auto const& imap : tagMap) {
+			ss << this->viewDataPoint(imap.first) << std::endl;
+		}
+		return ss.str();
+	}
+
     /// <summary>
     /// Collates the data of the datapoint with the name tagName. 
     /// Will return a text readout of various statistical paramters.

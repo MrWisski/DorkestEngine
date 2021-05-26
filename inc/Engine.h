@@ -51,6 +51,7 @@
 
 #pragma once
 #include "olcPixelGameEngine.h"
+
 #include "Extensions\olcPGEX_SplashScreen.h"
 #include "Extensions\olcPGEX_Camera2D.h"
 //The OLC Sound Extension
@@ -62,22 +63,21 @@
 #include "Util/Math/Vector2.h"
 #include "Util/Math/Geometry/Ray.h"
 #include "World/Block.h"
-#include "Render/dorkestCamera.h"
-#include "Render/dorkestRenderer.h"
 #include "imguiWindows/ConsoleIMGUI.h"
 #include "imguiWindows/DebugIMGUI.h"
 #include <vector>
-#include "ECS/Scene.h"
+
 class dorkestRenderer;
 class Block;
-
+class dorkestBaseEntity;
+class dorkestScene;
 
 class Engine 
 {
 public:
-	dorkestRenderer* r;
+	dorkestScene* scene;
 	DebugStuff* toolwin;
-	Scene* scene;
+	
 
 	std::vector<Block> curStack;
 
@@ -108,12 +108,6 @@ public:
 	bool pressAnyKey();
 	bool OnUserCreate();
 	
-	void DrawGrid();
-	void drawTree();
-	bool sort(Block lhs, Block rhs);
-	
-	void renderBlocks();
-	void renderRays();
 	void doKeys(float fElapsedTime);
 
 	bool OnUserUpdate(float fElapsedTime);

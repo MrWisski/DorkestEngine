@@ -56,11 +56,12 @@
 #include "World/Block.h"
 #include "Render/dorkestSpriteManager.h"
 #include "Util/Math/Vector4.h"
-#include <algorithm>
 #include "Util/HitTest.h"
 #include "Extensions\olcPGEX_SplashScreen.h"
 #include "ECS/components.h"
 #include "Util/dorkestProfiler.h"
+#include "Render/dorkestRenderer.h"
+#include "ECS/dorkestScene.h"
 /*
 Megarev — Today at 2:23 PM
 Calculate the dot product of a given side with the light vector(edited)
@@ -108,17 +109,7 @@ std::string textIn(olc::PixelGameEngine* pge) {
 
 bool Engine::OnUserCreate()
 {
-
-	this->r = new dorkestRenderer();
-	this->r->cam = new dorkestCamera();
-	this->scene = new Scene();
-
-	//debug("Initializing camera to " + std::to_string());
-	r->cam->setScreenSize(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y);
-	r->cam->setCenter(r->cam->getScreenWidth() / 2.0f, r->cam->getScreenHeight() / 2.0f, 0);
-	r->cam->setOrthogonal(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y, 0, 1);
-
-	//cam->setViewport(instPGE::getInstance()->GetScreenPixelSize().x, instPGE::getInstance()->GetScreenPixelSize().y);
+	this->scene = new dorkestScene("TEST SCENE");
 
 	dorkestSpriteMan* dsm = dorkestSpriteMan::getInstance();
 	dsm->addNewSpriteSheet("BasicISO", "./res/ISO/BasicIso.png");
@@ -339,15 +330,17 @@ void Engine::doKeys(float fElapsedTime) {
 	if (instPGE::getInstance()->GetKey(olc::Key::M).bPressed) {
 		for (int x = 0; x < 16; x++)
 			for (int y = 0; y < 16; y++) {
-				debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
+				//debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
 				dorkestBaseEntity* entp = this->scene->createNewEntity();
 				entp->addComponent<c_baseColor>(olc::GREEN);
+				entp->addComponent<c_imposter>();
+				entp->addComponent<c_statusflags>();
 				entp->addComponent<c_sprite>("oCube");
 				Vector3f wPos = Vector3f(x, y, this->toolwin->getZ());
-				Vector2i sPos = r->MapToScreen({ 32, 32 }, 1, wPos, { 0,0 });
+				Vector2i sPos = scene->getRenderer()->MapToScreen({ 32, 32 }, 1, wPos, { 0,0 });
 				entp->addComponent<c_position>(wPos, sPos);
 				this->ents.push_back(entp);
-				debug("DONE!");
+				//debug("DONE!");
 
 			}
 	}
@@ -364,11 +357,11 @@ void Engine::doKeys(float fElapsedTime) {
 	else { toggle = false; }
 
 	if (instPGE::getInstance()->GetKey(olc::Key::C).bPressed) {
-		r->cam->setCenter(r->cam->getScreenWidth() / 2.0f, r->cam->getScreenHeight() / 2.0f, 0);
+		scene->setCameraCenter(scene->getCamera()->getScreenWidth() / 2.0f, scene->getCamera()->getScreenHeight() / 2.0f, 0);
 	}
 
 	if (instPGE::getInstance()->GetKey(olc::Key::X).bPressed) {
-		r->cam->setCenter(0, 0, 0);
+		scene->setCameraCenter(0, 0, 0);
 
 	}
 
@@ -379,10 +372,7 @@ void Engine::doKeys(float fElapsedTime) {
 
 
 	if (instPGE::getInstance()->GetKey(olc::Key::Z).bPressed) {
-		debug(dorkestProfiler::getInstance()->viewDataPoint("CreateNewEntity"));
-		debug(dorkestProfiler::getInstance()->viewDataPoint("RenderEntities"));
-		debug(dorkestProfiler::getInstance()->viewDataPoint("SortEntities"));
-		debug(dorkestProfiler::getInstance()->viewDataPoint("DoFrame"));
+		debug(dorkestProfiler::getInstance()->viewAllPoints());
 	}
 	else if (instPGE::getInstance()->GetKey(olc::Key::Z).bHeld) {
 
@@ -406,11 +396,11 @@ void Engine::doKeys(float fElapsedTime) {
 	else if (instPGE::getInstance()->GetMouse(2).bHeld) {
 		//if (instPGE::getInstance()->GetMouse(1).bHeld) {
 		Vector2d mpv = Vector2d(vMouse) - dragpos;// dragpos;//Vector2d(dragpos.x - (double)mp.x, dragpos.y - (double)mp.y);
-		Vector2d cp = olc::vd2d(r->cam->getCenter());
+		Vector2d cp = olc::vd2d(scene->getCamera()->getCenter());
 		cp += (mpv * 3) * fElapsedTime;
 		//cp.lerp(fElapsedTime,dragpos);
 		debug(cp.toStr());
-		r->cam->setCenter(cp.x, cp.y, 0);
+		scene->setCameraCenter(cp.x, cp.y, 0);
 
 	}
 
@@ -456,7 +446,7 @@ bool Engine::OnUserUpdate(float fElapsedTime)
 {
 	
 	vMouse = instPGE::getInstance()->GetMousePos();
-	vMouseMap = r->ScreenToMap({ 32,16 }, 1, vMouse, { 0,0 });
+	vMouseMap = scene->getRenderer()->ScreenToMap({ 32,16 }, 1, vMouse, { 0,0 });
 
 	static bool skipSplash = true;
 	//Show splash screen.
@@ -470,7 +460,6 @@ bool Engine::OnUserUpdate(float fElapsedTime)
 	instPGE::getInstance()->Clear(olc::GREY);
 	
 	doKeys(fElapsedTime);
-	r->doRender(fElapsedTime);
 	scene->doFrame(fElapsedTime);
 
 	this->toolwin->render();

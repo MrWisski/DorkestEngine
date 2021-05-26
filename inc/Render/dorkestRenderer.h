@@ -64,15 +64,15 @@ class dorkestSprite;
 
 class dorkestRenderer {
 public:
-	dorkestCamera* cam;
+	
 	
 	enum sType { DIFFUSE = 64, NORMAL = 32, WIRE = 0 };
 
-	olc::Pixel forcedColor;
-	float forceScale;
-	Vector2f forceSize;
-
-
+	void setCam(dorkestCamera* cam) { this->cam = cam; }
+	void setForcedColor(olc::Pixel c) { this->forcedColor = c; }
+	void setForcedSpriteSize(Vector2f newSize) { this->forceSize = newSize; }
+	void setForcedScale(float newScale) { this->forceScale = newScale; }
+	dorkestCamera* getCamera() { if (this->cam != nullptr) return this->cam; else error("getCamera RETURNING NULL"); return nullptr; }
 	Vector3d PixelToNormal(int r, int g, int b);
 	
 	olc::vi2d MapToScreen(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
@@ -101,9 +101,17 @@ public:
 
 	void doRender(float fElapsedTime);
 	
-	dorkestRenderer() {}
-	~dorkestRenderer() {}
+
+	dorkestRenderer() = default;
+	~dorkestRenderer() = default;
+	friend class dorkestScene;
 protected:
 	bool drawDecal(Vector2f dest, Vector2f destSize, olc::Decal*, Vector2f src, Vector2f srcSize, olc::Pixel color);
 	bool drawSprite(Vector2f dest, int scale, olc::Sprite*, Vector2f src, Vector2f srcSize);
+private:
+	dorkestCamera* cam = nullptr;
+	olc::Pixel forcedColor = olc::BLACK;
+	float forceScale = 1.0f;
+	Vector2f forceSize = {32,32};
+
 };

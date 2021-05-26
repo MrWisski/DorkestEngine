@@ -143,7 +143,7 @@
     <ClInclude Include="inc\ECS\dorkestBaseEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\ECS\Scene.h">
+    <ClInclude Include="inc\ECS\dorkestScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Util\dorkestProfiler.h">
