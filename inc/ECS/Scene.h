@@ -14,7 +14,7 @@ public:
 	bool doFrame(float fElapsedTime);
 	dorkestBaseEntity* createNewEntity()
 	{
-		dorkestProfile dp("CreateNewEntity");
+		dorkestDataPoint dp("CreateNewEntity");
 		dorkestBaseEntity* newE = new dorkestBaseEntity(this->sceneReg);
 		regClean = false;
 		return newE;
