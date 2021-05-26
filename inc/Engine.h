@@ -9,22 +9,22 @@
 
 #include "Util/Math/Vector3.h"
 #include "Util/Math/Vector2.h"
-#include "Util/Math/Ray.h"
+#include "Util/Math/Geometry/Ray.h"
 #include "World/Block.h"
 #include "Render/dorkestCamera.h"
-#include "Render/Renderer.h"
-#include "Util/ConsoleIMGUI.h"
-#include "Util/DebugIMGUI.h"
+#include "Render/dorkestRenderer.h"
+#include "imguiWindows/ConsoleIMGUI.h"
+#include "imguiWindows/DebugIMGUI.h"
 #include <vector>
 #include "ECS/Scene.h"
-class Renderer;
+class dorkestRenderer;
 class Block;
 
 
 class Engine 
 {
 public:
-	Renderer* r;
+	dorkestRenderer* r;
 	DebugStuff* toolwin;
 	Scene* scene;
 

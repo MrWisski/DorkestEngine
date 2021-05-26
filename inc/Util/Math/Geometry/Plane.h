@@ -1,6 +1,6 @@
 #pragma once
-#include "Vector3.h"
-#include "Ray.h"
+#include "Util/Math/Vector3.h"
+#include "Util/Math/Geometry/Ray.h"
 template <class T>
 class Plane3d {
 public:

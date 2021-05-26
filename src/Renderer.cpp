@@ -1,14 +1,14 @@
-#include "Render/Renderer.h"
+#include "Render/dorkestRenderer.h"
 #include "instPGE.h"
 #include "Util/Log.h"
 #include "Render/dorkestSpriteManager.h"
 #include "Render/dorkestSprite.h"
 #include <Util/Math/Vector4.h>
 
-#include <Util/Math/Ray.h>
+#include <Util/Math/Geometry/Ray.h>
 #include <algorithm>
 
-void Renderer::drawRay(Ray<float> ray) {
+void dorkestRenderer::drawRay(Ray<float> ray) {
 	forcedColor = olc::WHITE;
 	forceSize = Vector2f(32, 32);
 	ray.dir.norm();
@@ -19,17 +19,17 @@ void Renderer::drawRay(Ray<float> ray) {
 
 
 	screenLine(so, se, olc::RED);
-	drawToWorld(ray.orig.x, ray.orig.y, ray.orig.z, "basicSphere", Renderer::DIFFUSE, true, false, true);
+	drawToWorld(ray.orig.x, ray.orig.y, ray.orig.z, "basicSphere", dorkestRenderer::DIFFUSE, true, false, true);
 }
 
-void Renderer::screenLineW(Vector3i from, Vector3i to, olc::Pixel col) {
+void dorkestRenderer::screenLineW(Vector3i from, Vector3i to, olc::Pixel col) {
 	olc::vi2d f = MapToScreen({ 32,32 }, 1, from, { 0,0 });
 	olc::vi2d t = MapToScreen({ 32,32 }, 1, to, { 0,0 });
 
 	screenLine(f, t, col);
 }
 
-void Renderer::screenLine(Vector2i from, Vector2i to, olc::Pixel col) {
+void dorkestRenderer::screenLine(Vector2i from, Vector2i to, olc::Pixel col) {
 	Vector4f c;
 	c = Vector4f(col.r, col.b, col.g, col.a);
 	debug("Drawing line " + from.toStr() + " to " + to.toStr() + " color = " + c.toString());
@@ -40,12 +40,12 @@ void Renderer::screenLine(Vector2i from, Vector2i to, olc::Pixel col) {
 }
 
 
-void Renderer::doRender(float fElapsedTime) {
+void dorkestRenderer::doRender(float fElapsedTime) {
 
 	//errCol = olc::Pixel(std::rand() % 255, std::rand() % 255, std::rand() % 255, 255);
 }
 
-Vector3d Renderer::PixelToNormal(int r, int g, int b)
+Vector3d dorkestRenderer::PixelToNormal(int r, int g, int b)
 {
 	double rr = (((double)r / 256.0f) * 2.0f) - 1.0f; // 0
 	double gg = (((double)g / 256.0f) * 2.0f) - 1.0f; // 0.0859375
@@ -58,7 +58,7 @@ Vector3d Renderer::PixelToNormal(int r, int g, int b)
 	return rgb;
 }
 
-olc::vi2d Renderer::MapToScreen(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset)
+olc::vi2d dorkestRenderer::MapToScreen(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset)
 {
 	//The grid is universal. OBEY THE GRID.
 	float sizex = vTileSize.x;
@@ -79,7 +79,7 @@ olc::vi2d Renderer::MapToScreen(Vector2f vTileSize, float scaleFactor, Vector3f 
 
 };
 
-olc::vf2d Renderer::ScreenToMap(Vector2f vTileSize, float scaleFactor, Vector2f m, Vector2f offset) {
+olc::vf2d dorkestRenderer::ScreenToMap(Vector2f vTileSize, float scaleFactor, Vector2f m, Vector2f offset) {
 	//Correct for the camera position
 	m.x -= cam->getCenter().x;
 	m.y -= cam->getCenter().y;
@@ -101,18 +101,18 @@ olc::vf2d Renderer::ScreenToMap(Vector2f vTileSize, float scaleFactor, Vector2f 
 	return olc::vf2d(ltx, lty);
 }
 
-bool Renderer::drawDecal(Vector2f dest, Vector2f destSize, olc::Decal* spr, Vector2f src, Vector2f srcSize, olc::Pixel color) {
+bool dorkestRenderer::drawDecal(Vector2f dest, Vector2f destSize, olc::Decal* spr, Vector2f src, Vector2f srcSize, olc::Pixel color) {
 	instPGE::getInstance()->DrawPartialDecal(dest, destSize, spr,	src, srcSize, color);
 	return true;
 }
 
 
-bool Renderer::drawSprite(Vector2f dest, int scale, olc::Sprite* spr, Vector2f src, Vector2f srcSize) {
+bool dorkestRenderer::drawSprite(Vector2f dest, int scale, olc::Sprite* spr, Vector2f src, Vector2f srcSize) {
 	instPGE::getInstance()->DrawPartialSprite(dest,	spr, src, srcSize, scale);
 	return true;
 }
 
-bool Renderer::drawToScreen(float ScreenX, float ScreenY, std::string name, sType spriteType, bool ForceColor, bool ForceScale, bool ForceSize)
+bool dorkestRenderer::drawToScreen(float ScreenX, float ScreenY, std::string name, sType spriteType, bool ForceColor, bool ForceScale, bool ForceSize)
 {
 	dorkestSprite* spr = dorkestSpriteMan::getInstance()->getDorkestSprite(name);
 	if (spr == nullptr) { return false; }
@@ -154,7 +154,7 @@ bool Renderer::drawToScreen(float ScreenX, float ScreenY, std::string name, sTyp
 	return true;
 }
 
-bool Renderer::drawToWorld(float WorldX, float WorldY, float WorldZ, std::string name, sType spriteType, bool ForceColor, bool ForceScale, bool ForceSize)
+bool dorkestRenderer::drawToWorld(float WorldX, float WorldY, float WorldZ, std::string name, sType spriteType, bool ForceColor, bool ForceScale, bool ForceSize)
 {
 	//debug("Renderer::drawSpriteToWorld(" + std::to_string(WorldX) + ", " + std::to_string(WorldY) + ", " + std::to_string(WorldZ) + ", " + name + ")");
 

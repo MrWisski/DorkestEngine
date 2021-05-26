@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Ray.h"
-#include "LineSeg.h"
-#include "AABB.h"
-#include "Vector3.h"
-#include "Plane.h"
+#include "Util/Math/Geometry/Ray.h"
+#include "Util/Math/Geometry/LineSeg.h"
+#include "Util/Math/Geometry/AABB.h"
+#include "Util/Math/Vector3.h"
+#include "Util/Math/Geometry/Plane.h"
 
 #define SMALL_NUM   0.00000001 // anything that avoids division overflow
 // dot product (3D) which allows vector operations in arguments

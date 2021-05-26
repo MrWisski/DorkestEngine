@@ -26,7 +26,7 @@ bool Scene::doFrame(float fElapsedTime) {
 		dorkestDataPoint dp("RenderEntities");
 		for (auto [entity, pos, color, spritename] : sceneView.each()) {
 			instPGE::getInstance()->engine->r->forcedColor = color;
-			instPGE::getInstance()->engine->r->drawToScreen(pos.screenPos.x, pos.screenPos.y, spritename, Renderer::DIFFUSE, true);
+			instPGE::getInstance()->engine->r->drawToScreen(pos.screenPos.x, pos.screenPos.y, spritename, dorkestRenderer::DIFFUSE, true);
 
 		}
 	}

@@ -365,3 +365,5 @@ FodyWeavers.xsd
 /x64
 /Release
 /Debug
+/glew32.dll
+/imgui.ini

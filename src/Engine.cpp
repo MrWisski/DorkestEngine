@@ -6,7 +6,7 @@
 #include "Render/dorkestSpriteManager.h"
 #include "Util/Math/Vector4.h"
 #include <algorithm>
-#include "Util/Math/HitTest.h"
+#include "Util/HitTest.h"
 #include "Extensions\olcPGEX_SplashScreen.h"
 #include "ECS/components.h"
 #include "Util/dorkestProfiler.h"
@@ -58,7 +58,7 @@ std::string textIn(olc::PixelGameEngine* pge) {
 bool Engine::OnUserCreate()
 {
 
-	this->r = new Renderer();
+	this->r = new dorkestRenderer();
 	this->r->cam = new dorkestCamera();
 	this->scene = new Scene();
 

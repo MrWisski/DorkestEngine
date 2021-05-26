@@ -1,6 +1,6 @@
 #pragma once
-#include "Vector3.h"
-#include "../Log.h"
+#include "Util/Math/Vector3.h"
+#include "Util/Log.h"
 
 
 

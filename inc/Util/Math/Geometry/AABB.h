@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector3.h"
+#include "Util/Math/Vector3.h"
 #include <string>
 #include <sstream>
 #include "olcPixelGameEngine.h"

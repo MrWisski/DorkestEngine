@@ -5,14 +5,14 @@
 #include "Util/Math/Vector3.h"
 #include "dorkestCamera.h"
 #include "dorkestSprite.h"
-#include "Util/Math/LineSeg.h"
-#include "Util/Math/AABB.h"
+#include "Util/Math/Geometry/LineSeg.h"
+#include "Util/Math/Geometry/AABB.h"
 
 class dorkestSprite;
 
 
 
-class Renderer {
+class dorkestRenderer {
 public:
 	dorkestCamera* cam;
 	
@@ -51,8 +51,8 @@ public:
 
 	void doRender(float fElapsedTime);
 	
-	Renderer() {}
-	~Renderer() {}
+	dorkestRenderer() {}
+	~dorkestRenderer() {}
 protected:
 	bool drawDecal(Vector2f dest, Vector2f destSize, olc::Decal*, Vector2f src, Vector2f srcSize, olc::Pixel color);
 	bool drawSprite(Vector2f dest, int scale, olc::Sprite*, Vector2f src, Vector2f srcSize);

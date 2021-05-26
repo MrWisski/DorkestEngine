@@ -83,13 +83,13 @@
     <ClInclude Include="inc\Util\Math\Octree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\AABB.h">
+    <ClInclude Include="inc\Util\Math\Geometry\AABB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\ConsoleIMGUI.h">
+    <ClInclude Include="inc\imguiWindows\ConsoleIMGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Render\Renderer.h">
+    <ClInclude Include="inc\Render\dorkestRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\instPGE.h">
@@ -98,7 +98,7 @@
     <ClInclude Include="inc\World\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\Ray.h">
+    <ClInclude Include="inc\Util\Math\Geometry\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Render\dorkestCamera.h">
@@ -119,22 +119,19 @@
     <ClInclude Include="inc\Util\Math\Matrix4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\Quaternion.h">
+    <ClInclude Include="inc\Util\Math\Geometry\Quaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\HitTest.h">
+    <ClInclude Include="inc\Util\HitTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\DebugIMGUI.h">
+    <ClInclude Include="inc\imguiWindows\DebugIMGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\Plane.h">
+    <ClInclude Include="inc\Util\Math\Geometry\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\Math\LineSeg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Util\Math\SVO.h">
+    <ClInclude Include="inc\Util\Math\Geometry\LineSeg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\ECS\components.h">
