@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MapSeg.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="src\dorkestCamera.cpp" />
     <ClCompile Include="src\dorkestProfiler.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="inc\ECS\dorkestBaseEntity.h" />
     <ClInclude Include="inc\ECS\dorkestScene.h" />
     <ClInclude Include="inc\ECS\Systems\RenderSystem.h" />
+    <ClInclude Include="inc\ECS\TerrainEntity.h" />
     <ClInclude Include="inc\Engine.h" />
     <ClInclude Include="inc\instPGE.h" />
     <ClInclude Include="inc\Render\dorkestCamera.h" />
@@ -200,7 +202,7 @@
     <ClInclude Include="inc\Util\Status.h" />
     <ClInclude Include="inc\Util\Math\Vector2.h" />
     <ClInclude Include="inc\Util\Math\Vector3.h" />
-    <ClInclude Include="inc\World\Block.h" />
+    <ClInclude Include="inc\World\MapSeg.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="res\CantinaBand3.wav" />

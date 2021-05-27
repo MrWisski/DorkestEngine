@@ -3,6 +3,7 @@
 #include "../Util/Math/Vector3.h"
 #include <olcPixelGameEngine.h>
 #include "Util/Log.h"
+#include <Util/Math/Geometry/AABB.h>
 
 /// <summary>
 /// Dorkest Engine ECS Nametag Component
@@ -116,4 +117,23 @@ struct c_statusflags {
 	c_statusflags(const c_statusflags& tag) = default;
 
 };
+
+/// <summary>
+/// AABB Component
+/// Stores an AABB for the entity.
+/// </summary>
+struct c_aabb {
+	AABB<float> bBox;
+
+	c_aabb() = default;
+	c_aabb(const c_aabb& tag) = default;
+	c_aabb(AABB<float> boundingBox) : bBox(boundingBox) {}
+	~c_aabb() {}
+
+	operator AABB<float> () { return bBox; }
+	operator const AABB<float> () const { return bBox; }
+
+};
+
+
  

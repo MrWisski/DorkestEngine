@@ -5,7 +5,7 @@
 class dorkestBaseEntity {
 public:
 
-	dorkestBaseEntity(entt::registry* reg) : m_reg(reg), m_handle(entt::null){ 
+	dorkestBaseEntity(entt::registry* reg) : m_reg(reg), m_handle(entt::null) { 
 		if (m_reg == nullptr) {	error("Null pointer to registry passed to entity constructor!"); return;}
 		m_handle = m_reg->create();
 
@@ -48,6 +48,8 @@ public:
 		//HZ_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 		m_reg.remove<T>(m_handle);
 	}
+
+	entt::entity getHandle() { return m_handle; }
 
 	operator bool() const { return m_handle != entt::null; }
 	operator entt::entity() const { return m_handle; }
