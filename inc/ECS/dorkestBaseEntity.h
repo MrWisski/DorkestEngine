@@ -28,11 +28,12 @@ public:
 	}
 
 	template<typename T>
-	T& getComponent()
+	T* getComponent()
 	{
-		if (m_reg == nullptr) { error("Null pointer to registry!"); return; }
+		if (m_reg == nullptr) { error("Null pointer to registry!"); return nullptr; }
 		//HZ_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-		return m_reg->get<T>(m_handle);
+		T retval = m_reg->get<T>(m_handle);
+		return &retval;
 	}
 
 	template<typename T>

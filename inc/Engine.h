@@ -62,7 +62,7 @@
 #include "Util/Math/Vector3.h"
 #include "Util/Math/Vector2.h"
 #include "Util/Math/Geometry/Ray.h"
-#include "World/Block.h"
+
 #include "imguiWindows/ConsoleIMGUI.h"
 #include "imguiWindows/DebugIMGUI.h"
 #include <vector>
@@ -78,8 +78,6 @@ public:
 	dorkestScene* scene;
 	DebugStuff* toolwin;
 	
-
-	std::vector<Block> curStack;
 
 	std::map<olc::vi2d, olc::Pixel> pMap;
 	AppConsole console;

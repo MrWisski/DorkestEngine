@@ -4,8 +4,20 @@
 #include "dorkestBaseEntity.h"
 #include "Render/dorkestCamera.h"
 #include "Util/dorkestProfiler.h"
+#include <Util/Math/Geometry/AABB.h>
 
 class dorkestRenderer;
+class TerrainEntity;
+class dorkestMap;
+class MapSeg;
+
+//The size that a mapseg initializes to (16x16x16)
+const int SEGMENT_DIMENSION = 16;
+//The max size mapseg map dimension (8x8)
+const int MAX_MAPSEG_DIMENSION = 16;
+
+//an 8x8 of 16x16x16 yields 4,000 meters per side.
+
 
 class dorkestScene {
 public:
@@ -16,6 +28,11 @@ public:
 	dorkestCamera* getCamera();
 
 	/// <summary>
+	/// Forces the scene to recalculate lighting.
+	/// </summary>
+	void recalcLight();
+
+	/// <summary>
 	/// Does all the stuff you need to do to render a frame of the scene.
 	/// </summary>
 	/// <param name="fElapsedTime"> Time since last call </param>
@@ -23,10 +40,17 @@ public:
 	bool doFrame(float fElapsedTime);
 
 	/// <summary>
-	/// Creates a new entity for this scene.
+	/// Creates a new entity for this scene. Use createTerrain() to create suitable parts of a map.
 	/// </summary>
 	/// <returns>a dorkestBaseEntity pointer encapsulating the entt::entity handle</returns>
 	dorkestBaseEntity* createNewEntity();
+
+	/// <summary>
+	/// Creates a new piece of terrain for this scene.
+	/// </summary>
+	/// <param name="bounds">The bounding box of the terrain (Restricted to 1x1x1 max!)</param>
+	/// <returns>A TerrainEntity wrapper if successful, nullptr if not.</returns>
+	TerrainEntity* createTerrain(AABB<float> bounds);
 
 	/// <summary>
 	/// retrieves a dorkestBaseEntity from the registry.
@@ -42,4 +66,7 @@ private:
 	bool regClean = false;
 	dorkestCamera* cam = nullptr;
 	dorkestRenderer* r = nullptr;
+
+	dorkestMap* map;
+	//std::vector<MapSeg*> map;
 };

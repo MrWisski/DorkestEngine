@@ -53,7 +53,7 @@
 #define OLC_PGEX_AUDIOCONVERT
 
 #include "Engine.h"
-#include "World/Block.h"
+
 #include "Render/dorkestSpriteManager.h"
 #include "Util/Math/Vector4.h"
 #include "Util/HitTest.h"
@@ -330,17 +330,12 @@ void Engine::doKeys(float fElapsedTime) {
 	if (instPGE::getInstance()->GetKey(olc::Key::M).bPressed) {
 		for (int x = 0; x < 16; x++)
 			for (int y = 0; y < 16; y++) {
-				//debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
-				dorkestBaseEntity* entp = this->scene->createNewEntity();
-				entp->addComponent<c_baseColor>(olc::GREEN);
-				entp->addComponent<c_imposter>();
-				entp->addComponent<c_statusflags>();
-				entp->addComponent<c_sprite>("oCube");
-				Vector3f wPos = Vector3f(x, y, this->toolwin->getZ());
-				Vector2i sPos = scene->getRenderer()->MapToScreen({ 32, 32 }, 1, wPos, { 0,0 });
-				entp->addComponent<c_position>(wPos, sPos);
+				debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
+				AABB<float> tbb(Vector3f(x,y,0),Vector3f(1,1,1));
+				dorkestBaseEntity* entp = (dorkestBaseEntity*)this->scene->createTerrain(tbb);
+				if (entp == nullptr) { error("DBE is null!"); }
 				this->ents.push_back(entp);
-				//debug("DONE!");
+				debug("DONE!");
 
 			}
 	}
@@ -374,7 +369,7 @@ void Engine::doKeys(float fElapsedTime) {
 	if (instPGE::getInstance()->GetKey(olc::Key::Z).bPressed) {
 		debug(dorkestProfiler::getInstance()->viewAllPoints());
 	}
-	else if (instPGE::getInstance()->GetKey(olc::Key::Z).bHeld) {
+	if (instPGE::getInstance()->GetKey(olc::Key::Z).bHeld) {
 
 	}
 
@@ -385,7 +380,9 @@ void Engine::doKeys(float fElapsedTime) {
 		//DrawGrid();
 	}
 
-	if (instPGE::getInstance()->GetKey(olc::Key::DEL).bPressed) {
+	if (instPGE::getInstance()->GetKey(olc::Key::L).bPressed) {
+		debug("Recalculating lighting.");
+		scene->recalcLight();
 
 	}
 
@@ -405,7 +402,19 @@ void Engine::doKeys(float fElapsedTime) {
 	}
 
 	if (instPGE::getInstance()->GetMouse(0).bPressed) {
+		dorkestBaseEntity* newLight = this->scene->createNewEntity();
 
+		newLight->addComponent<c_staticLight>();
+		newLight->getComponent<c_staticLight>()->data.linear = 0.2f;
+		newLight->getComponent<c_staticLight>()->data.color = olc::YELLOW;
+		Vector2f vMT = this->scene->getRenderer()->ScreenToMap({ 32.0f,32.0f }, 1, vMouse, { 0, 0 });
+
+		newLight->addComponent<c_position>(Vector3f(vMT.x,vMT.y,0),vMouse);
+		newLight->addComponent<c_sprite>("basicSphere");
+		newLight->addComponent<c_baseColor>(olc::YELLOW);
+
+
+		
 
 
 	};

@@ -4,6 +4,7 @@
 #include <olcPixelGameEngine.h>
 #include "Util/Log.h"
 #include <Util/Math/Geometry/AABB.h>
+#include <World/Light.h>
 
 /// <summary>
 /// Dorkest Engine ECS Nametag Component
@@ -11,6 +12,7 @@
 /// </summary>
 
 struct c_nameTag {
+public:
 	std::string pubName;
 
 	c_nameTag() = default;
@@ -27,6 +29,7 @@ struct c_nameTag {
 /// Stores the world and screen position of an entity that includes it.
 /// </summary>
 struct c_position {
+public:
 	Vector3f worldPos = { 0,0,0 };
 	Vector2i screenPos = {0,0};
 
@@ -34,8 +37,12 @@ struct c_position {
 	c_position(const c_position & pos) = default;
 	c_position(const Vector3f & wPos, const Vector2i & sPos) : worldPos(wPos), screenPos(sPos) {}
 
+	operator Vector3f () { return worldPos; }
 	operator Vector3f& () { return worldPos; }
+	operator const Vector3f() const { return worldPos; }
 	operator const Vector3f& () const { return worldPos; }
+
+	operator Vector2i () { return screenPos; }
 	operator Vector2i& () { return screenPos; }
 	operator const Vector2i& () const { return screenPos; }
 };
@@ -46,6 +53,7 @@ struct c_position {
 /// </summary>
 
 struct c_baseColor {
+public:
 	olc::Pixel color;
 
 	c_baseColor() = default;
@@ -63,6 +71,7 @@ struct c_baseColor {
 /// </summary>
 
 struct c_sprite {
+public:
 	std::string spriteName;
 
 	c_sprite() = default;
@@ -79,6 +88,7 @@ struct c_sprite {
 /// Stores a pre-rendered image of an entity that includes it. Controls the pointer to the imposter decal.
 /// </summary>
 struct c_imposter {
+public:
 	olc::Decal* imposter = nullptr;
 	Vector2i decalsize = { 0,0 };
 
@@ -97,6 +107,7 @@ struct c_imposter {
 /// Stores status flags from the entities it is attached to.
 /// </summary>
 struct c_statusflags {
+public:
 	struct FLAGS_A {
 		bool isNew = true;
 		bool needsImposter = false;
@@ -123,16 +134,88 @@ struct c_statusflags {
 /// Stores an AABB for the entity.
 /// </summary>
 struct c_aabb {
+public:
 	AABB<float> bBox;
 
 	c_aabb() = default;
 	c_aabb(const c_aabb& tag) = default;
+
 	c_aabb(AABB<float> boundingBox) : bBox(boundingBox) {}
 	~c_aabb() {}
 
 	operator AABB<float> () { return bBox; }
 	operator const AABB<float> () const { return bBox; }
 
+};
+
+class BlankData {};
+
+/// <summary>
+/// 
+/// </summary>
+struct c_blank {
+public:
+	BlankData data;
+
+	c_blank() = default;
+	c_blank(const c_blank& data) = default;
+
+	c_blank(const BlankData& data) : data(data) {};
+	~c_blank() = default;
+
+	operator BlankData() { return data; }
+	operator const BlankData() const { return data; }
+};
+
+/// <summary>
+/// A component indicating the entity emits light.
+/// </summary>
+struct c_staticLight {
+public:
+	LightSource data;
+
+	c_staticLight() = default;
+	c_staticLight(const c_staticLight& data) = default;
+
+	c_staticLight(const LightSource& data) : data(data) {};
+	~c_staticLight() = default;
+
+	operator LightSource() { return data; }
+	operator const LightSource() const { return data; }
+};
+
+/// <summary>
+/// A component indicating the entity emits light.
+/// </summary>
+struct c_dynamicLight {
+public:
+	LightSource data;
+
+	c_dynamicLight() = default;
+	c_dynamicLight(const c_dynamicLight& data) = default;
+
+	c_dynamicLight(const LightSource& data) : data(data) {};
+	~c_dynamicLight() = default;
+
+	operator LightSource() { return data; }
+	operator const LightSource() const { return data; }
+};
+
+/// <summary>
+/// A component that accumulates incoming light sources
+/// </summary>
+struct c_lightSink {
+public:
+	LightSink data;
+
+	c_lightSink() = default;
+	c_lightSink(const c_lightSink& data) = default;
+
+	c_lightSink(const LightSink& data) : data(data) {};
+	~c_lightSink() = default;
+
+	operator LightSink() { return data; }
+	operator const LightSink() const { return data; }
 };
 
 

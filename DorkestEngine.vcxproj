@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\dorkestMap.cpp" />
     <ClCompile Include="src\MapSeg.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="src\dorkestCamera.cpp" />
@@ -202,6 +203,8 @@
     <ClInclude Include="inc\Util\Status.h" />
     <ClInclude Include="inc\Util\Math\Vector2.h" />
     <ClInclude Include="inc\Util\Math\Vector3.h" />
+    <ClInclude Include="inc\World\dorkestMap.h" />
+    <ClInclude Include="inc\World\Light.h" />
     <ClInclude Include="inc\World\MapSeg.h" />
   </ItemGroup>
   <ItemGroup>

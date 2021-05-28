@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include "olcPixelGameEngine.h"
+#include "Util/Log.h"
 
 
 using String = std::string;
@@ -50,6 +51,61 @@ public:
 		return (location > other.location && (location + size) > (other.location + other.size));
 	}
 
+	
+
+	bool contains(AABB<T> b) {
+		const bool htlut7[7] = { false, false, false, false, false, false, true };
+
+		AABB<T> a = *this;
+		//T mslx, msly, mslz, mllx, mlly, mllz;
+		//T Mslx, Msly, Mslz, Mllx, Mlly, Mllz;
+
+		//T mslx = std::min(a.getMin().x, b.getMin().x); 
+		T mllx = std::max(a.getMin().x, b.getMin().x);
+		//T msly = std::min(a.getMin().y, b.getMin().y);
+		T mlly = std::max(a.getMin().y, b.getMin().y);
+		//T mslz = std::min(a.getMin().z, b.getMin().z);
+		T mllz = std::max(a.getMin().z, b.getMin().z);
+
+		T Mslx = std::min(a.getMax().x, b.getMax().x);
+		//T Mllx = std::max(a.getMax().x, b.getMax().x);
+		T Msly = std::min(a.getMax().y, b.getMax().y);
+		//T Mlly = std::max(a.getMax().y, b.getMax().y);
+		T Mslz = std::min(a.getMax().z, b.getMax().z);
+		//T Mllz = std::max(a.getMax().z, b.getMax().z);
+
+
+
+		//std::stringstream ss;
+	   // ss << "tests : " << std::endl;
+
+		//ss << "min/Smallest v Max/Smallest GT " << (mslx < Mslx) << (msly < Msly) << (mslz < Mslz) << std::endl;
+		//ss << "min/Smallest v Max/Smallest GTET " << (mslx <= Mslx) << (msly <= Msly) << (mslz <= Mslz) << std::endl;
+
+		//ss << "min/Largest v Max/Largest GT " << (mllx < Mllx) << (mlly < Mlly) << (mllz < Mllz) << std::endl;
+		//ss << "min/Largest v Max/Largest GTET " << (mllx <= Mllx) << (mlly <= Mlly) << (mllz <= Mllz) << std::endl;
+
+
+		//ss << "min/Smallest v Max/Largest GT " << (mslx < Mllx) << (msly < Mlly) << (mslz < Mllz) << std::endl;
+		//ss << "min/Smallest v Max/Largest GTET " << (mslx <= Mllx) << (msly <= Mlly) << (mslz <= Mllz) << std::endl;
+
+
+		//ss << "min/Largest v Max/Smallest GT " << (mllx < Mslx) << (mlly < Msly) << (mllz < Mslz) << std::endl;
+		//ss << "min/Largest v Max/Smallest GTET " << (mllx <= Mslx) << (mlly <= Msly) << (mllz <= Mslz) << std::endl;
+
+		int GT = (mllx < Mslx) + (mlly < Msly) + (mllz < Mslz);
+		int GTET = (mllx <= Mslx) + (mlly <= Msly) + (mllz <= Mslz);
+
+		//ss << "gt = " << GT << std::endl;
+		//ss << "gtet = " << GTET << std::endl;
+		//ss << "tot = " << GT + GTET << std::endl;
+
+
+
+		//debug(ss.str());
+
+		return htlut7[GT + GTET];
+	}
 
 
 	/**

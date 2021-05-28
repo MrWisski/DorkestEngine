@@ -130,6 +130,8 @@ public:
 	{
 	}
 
+	Vector4(olc::Pixel color) : r(color.r), g(color.g), b(color.b), a(color.a) {}
+
 	//----------------[ access operators ]-------------------
 	/**
 	 * Copy operator
