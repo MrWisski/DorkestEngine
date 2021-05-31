@@ -27,6 +27,7 @@ dorkestMap::~dorkestMap() {
 	for (auto seg : map) {
 		if (seg != nullptr) {
 			delete seg;
+			seg = nullptr;
 			count++;
 		}
 	}

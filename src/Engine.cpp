@@ -76,6 +76,7 @@ If dot product = 0, then light is not able to reach that face
 
 #include "Util/Log.h"
 #include "instPGE.h"
+#include <Util/Math/Geometry/FibSphere.h>
 
 /*
 std::string textIn(olc::PixelGameEngine* pge) {
@@ -320,6 +321,24 @@ void Engine::renderRays() {
 
 }
 */
+
+void drawPlane(Engine* e) {
+	for (int x = 0; x < 16; x++)
+		for (int y = 0; y < 16; y++) {
+			debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
+			AABB<float> tbb(Vector3f(x, y, 0), Vector3f(1, 1, 1));
+			std::shared_ptr<dorkestBaseEntity> entp = e->scene->createTerrain(tbb);
+
+			c_baseColor cb = entp->getComponent<c_baseColor>();
+			cb.color = olc::WHITE;
+			entp->updateComponent<c_baseColor>(cb);
+
+			if (entp == nullptr) { error("DBE is null!"); }
+			e->ents.push_back(entp);
+			debug("DONE!");
+
+		}
+}
 void Engine::doKeys(float fElapsedTime) {
 
 	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) {
@@ -328,16 +347,7 @@ void Engine::doKeys(float fElapsedTime) {
 
 
 	if (instPGE::getInstance()->GetKey(olc::Key::M).bPressed) {
-		for (int x = 0; x < 16; x++)
-			for (int y = 0; y < 16; y++) {
-				debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
-				AABB<float> tbb(Vector3f(x,y,0),Vector3f(1,1,1));
-				dorkestBaseEntity* entp = (dorkestBaseEntity*)this->scene->createTerrain(tbb);
-				if (entp == nullptr) { error("DBE is null!"); }
-				this->ents.push_back(entp);
-				debug("DONE!");
-
-			}
+		drawPlane(this);
 	}
 
 	if (instPGE::getInstance()->GetKey(olc::Key::OEM_3).bPressed) {
@@ -360,7 +370,20 @@ void Engine::doKeys(float fElapsedTime) {
 
 	}
 
-	if (instPGE::getInstance()->GetKey(olc::Key::H).bPressed) {
+	
+	static float angle = 0;
+
+	if (instPGE::getInstance()->GetKey(olc::Key::H).bHeld) {
+		
+		if (fsphere == nullptr) { fsphere = new FibSphere(600); }
+		for (Vector3f p : this->fsphere->points) {
+			
+			this->scene->getRenderer()->setForcedColor(olc::WHITE);
+			this->scene->getRenderer()->setForcedScale(0.5f);
+			p.rot(0,0,angle);
+			this->scene->getRenderer()->drawToWorld(p.x * 8, p.y * 8, p.z *8 , "basicSphere",dorkestRenderer::DIFFUSE,true,true);
+		}
+		angle += 50 * fElapsedTime;
 
 	}
 
@@ -404,16 +427,24 @@ void Engine::doKeys(float fElapsedTime) {
 	if (instPGE::getInstance()->GetMouse(0).bPressed) {
 		dorkestBaseEntity* newLight = this->scene->createNewEntity();
 
-		newLight->addComponent<c_staticLight>();
-		newLight->getComponent<c_staticLight>()->data.linear = 0.2f;
-		newLight->getComponent<c_staticLight>()->data.color = olc::YELLOW;
+		LightSource data;
+		//data.linear = 0.09f;
+		//data.constant = 0.000000001f;
+		//data.quadratic = 0.023f;
+		data.color = this->toolwin->getColor();
+		data.constant = this->toolwin->getcon();
+		data.linear = this->toolwin->getlin();
+		data.quadratic = this->toolwin->getquad();
+
+		newLight->addComponent<c_staticLight>(data);
+		
 		Vector2f vMT = this->scene->getRenderer()->ScreenToMap({ 32.0f,32.0f }, 1, vMouse, { 0, 0 });
 
 		newLight->addComponent<c_position>(Vector3f(vMT.x,vMT.y,0),vMouse);
 		newLight->addComponent<c_sprite>("basicSphere");
 		newLight->addComponent<c_baseColor>(olc::YELLOW);
 
-
+		scene->recalcLight();
 		
 
 
@@ -425,7 +456,13 @@ void Engine::doKeys(float fElapsedTime) {
 
 	}
 
+	if (instPGE::getInstance()->GetKey(olc::Key::END).bPressed) {
+		ents.clear();
 
+		delete this->scene;
+		this->scene = new dorkestScene("TEST SCENE");
+		drawPlane(this);
+	}
 
 
 	if (instPGE::getInstance()->GetKey(olc::Key::RIGHT).bPressed) { moveposx += 1; }
@@ -476,6 +513,22 @@ bool Engine::OnUserUpdate(float fElapsedTime)
 };
 
 bool Engine::OnUserDestroy() {
+	debug("Cleaning up!");
 	olc::SOUND::DestroyAudio();
+	if (this->scene != nullptr)	delete this->scene;
+
+	if (this->toolwin != nullptr) delete toolwin;
+
+	if (!ents.empty()) {
+
+		ents.clear();
+	}
+
+	if (splashScreen != nullptr) { delete splashScreen; }
+
+	if (as != nullptr) { delete as; }
+
+	if (fsphere != nullptr) { delete fsphere; }
+
 	return true;
 };

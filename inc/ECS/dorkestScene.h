@@ -50,14 +50,20 @@ public:
 	/// </summary>
 	/// <param name="bounds">The bounding box of the terrain (Restricted to 1x1x1 max!)</param>
 	/// <returns>A TerrainEntity wrapper if successful, nullptr if not.</returns>
-	TerrainEntity* createTerrain(AABB<float> bounds);
+	std::shared_ptr<dorkestBaseEntity> createTerrain(AABB<float> bounds);
 
 	/// <summary>
 	/// retrieves a dorkestBaseEntity from the registry.
 	/// </summary>
 	/// <param name="ent">the entt handle to an entity.</param>
 	/// <returns>the equavalent dorkestBaseEntity pointer.</returns>
-	dorkestBaseEntity* getEntity(entt::entity ent);
+	std::shared_ptr<dorkestBaseEntity> getEntity(entt::entity ent);
+
+	/// <summary>
+	/// Lets the scene know ENTT registry was mucked with, and needs to be updated.
+	/// </summary>
+	void setDirty();
+
 
 	~dorkestScene();
 private:
@@ -67,6 +73,6 @@ private:
 	dorkestCamera* cam = nullptr;
 	dorkestRenderer* r = nullptr;
 
-	dorkestMap* map;
+	dorkestMap* map = nullptr;
 	//std::vector<MapSeg*> map;
 };

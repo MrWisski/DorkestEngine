@@ -191,6 +191,7 @@
     <ClInclude Include="inc\imguiWindows\ConsoleIMGUI.h" />
     <ClInclude Include="inc\Util\Log.h" />
     <ClInclude Include="inc\Util\HitTest.h" />
+    <ClInclude Include="inc\Util\Math\Geometry\FibSphere.h" />
     <ClInclude Include="inc\Util\Math\Geometry\LineSeg.h" />
     <ClInclude Include="inc\Util\Math\Matrix3.h" />
     <ClInclude Include="inc\Util\Math\Matrix4.h" />

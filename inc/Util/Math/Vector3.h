@@ -140,6 +140,9 @@ public:
 	{
 	}
 
+	//std::string& operator() { return toString(); }
+	
+
 	/**********************/
 	/***    Setters     ***/
 	/**********************/

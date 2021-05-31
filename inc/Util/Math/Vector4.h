@@ -131,6 +131,8 @@ public:
 	}
 
 	Vector4(olc::Pixel color) : r(color.r), g(color.g), b(color.b), a(color.a) {}
+	//std::string& operator() { return toString(); }
+
 
 	//----------------[ access operators ]-------------------
 	/**

@@ -164,6 +164,9 @@
     <ClInclude Include="inc\World\dorkestMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Util\Math\Geometry\FibSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Media Include="res\CantinaBand3.wav">

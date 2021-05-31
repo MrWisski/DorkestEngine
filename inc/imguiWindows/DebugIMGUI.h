@@ -40,7 +40,12 @@ public:
 	int getZ() { return *zVal; }
 	int getZ2() { return *zVal2; }
 
+	float getlin() { return linear; }
+	float getcon() { return constant; }
+	float getquad() { return quad; }
 
+
+	
 	DebugStuff() {
 		open = new bool(false);
 		zVal = new int(0);
@@ -50,6 +55,10 @@ public:
 		delete open, zVal, zVal2;
 	}
 private:
+
+	float linear = 0.6192f;
+	float quad = 0.062f;
+	float constant = 0.05f;
 
 	bool vis;
 	bool* open;
@@ -67,6 +76,12 @@ private:
 		ImGui::ColorEdit4("Object Color", c);
 		ImGui::SliderInt("Z Height P1", zVal, 0, 16);
 		ImGui::SliderInt("Z Height P2", zVal2, 0, 16);
+
+		ImGui::SliderFloat("Linear", &linear, 0.0f, 1.0f,"%1.3f");
+		ImGui::SliderFloat("Quadratic", &quad, 0.0f, 1.0f, "%1.3f");
+		ImGui::SliderFloat("Constant", &constant, 0.0f, 1.0f, "%1.3f");
+
+
 
 		ImGui::End();
 	}

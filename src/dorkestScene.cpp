@@ -34,20 +34,27 @@ void dorkestScene::recalcLight()
 
 	//TODO : Optimize this naive mess, once its actually working.
 
-	for(int x = 0; x < MAX_MAPSEG_DIMENSION; x++)
+	for (int x = 0; x < MAX_MAPSEG_DIMENSION; x++)
 		for (int y = 0; y < MAX_MAPSEG_DIMENSION; y++) {
-			this->map->get(x, y)->updateLighting(slvec,dlvec);
+			this->map->get(x, y)->updateLighting(slvec, dlvec);
 		}
 
 }
 
+void dorkestScene::setDirty()
+{
+	this->regClean = false;
+}
+
 dorkestScene::~dorkestScene() {
 	debug("Disposing of scene " + name);
-	sceneReg->clear();
-	delete sceneReg;
+	
 	if (cam != nullptr) { delete cam; }
 	if (r != nullptr) { delete r; }
 	if (this->map != nullptr) delete map;
+
+	sceneReg->clear();
+	delete sceneReg;
 }
 dorkestBaseEntity* dorkestScene::createNewEntity() {
 
@@ -56,7 +63,7 @@ dorkestBaseEntity* dorkestScene::createNewEntity() {
 	return newE;
 }
 
-TerrainEntity* dorkestScene::createTerrain(AABB<float> bounds)
+std::shared_ptr<dorkestBaseEntity> dorkestScene::createTerrain(AABB<float> bounds)
 {
 	//Check to see if we have any mapsegs that can take this block.
 	for (int x = 0; x < MAX_MAPSEG_DIMENSION; x++)
@@ -73,8 +80,8 @@ TerrainEntity* dorkestScene::createTerrain(AABB<float> bounds)
 	return nullptr;
 }
 
-dorkestBaseEntity* dorkestScene::getEntity(entt::entity ent) {
-	return new dorkestBaseEntity(this->sceneReg, ent);
+std::shared_ptr<dorkestBaseEntity> dorkestScene::getEntity(entt::entity ent) {
+	return std::make_shared<dorkestBaseEntity>(this->sceneReg, ent);
 }
 
 
@@ -121,8 +128,8 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 				//create a view.
 				//TODO : see if we can move this to a pregen variable inside the segment, maybe.
 
-				auto segView = mapreg->view<c_aabb, c_baseColor, c_sprite, c_imposter, c_statusflags, c_lightSink>();
-				for (auto [entity, bounds, color, spritename, imposter, flags, lightsink] : segView.each()) {
+				auto segView = mapreg->view<c_position, c_aabb, c_baseColor, c_sprite, c_imposter, c_statusflags, c_lightSink>();
+				for (auto [entity, pos, bounds, color, spritename, imposter, flags, lightsink] : segView.each()) {
 					//Do we draw the sprite from spritename, or the imposter from imposter?
 					//Prefer the imposter if it has one.
 					if (imposter.imposter != nullptr) {
@@ -130,7 +137,11 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 						r->drawDecal(r->MapToScreen({ 32,32 }, 1, bounds.bBox.getLocation(), { 0,0 }), imposter.decalsize, imposter.imposter, { 0,0 }, imposter.decalsize, color);
 					}
 					else {
+						//debug("lightsink data intensity = " + std::to_string(lightsink.data.intensity));
 						r->setForcedColor(lightsink.data.combinedColor);
+						
+						//r->setForcedColor(p);
+						//r->setForcedColor(blendColor((color.color * lightsink.data.intensity), lightsink.data.combinedColor, 0.9f));
 						r->drawToWorld(bounds.bBox.getLocation().x, bounds.bBox.getLocation().y, bounds.bBox.getLocation().z, spritename, dorkestRenderer::DIFFUSE, true);
 					}
 				}

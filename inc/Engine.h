@@ -62,6 +62,7 @@
 #include "Util/Math/Vector3.h"
 #include "Util/Math/Vector2.h"
 #include "Util/Math/Geometry/Ray.h"
+#include <Util/Math/Geometry/FibSphere.h>
 
 #include "imguiWindows/ConsoleIMGUI.h"
 #include "imguiWindows/DebugIMGUI.h"
@@ -77,16 +78,17 @@ class Engine
 public:
 	dorkestScene* scene;
 	DebugStuff* toolwin;
-	
+	std::vector<std::shared_ptr<dorkestBaseEntity>> ents;
+	olcPGEX_SplashScreen* splashScreen;
+	olc::SOUND::AudioSample* as;
+	FibSphere* fsphere;
 
 	std::map<olc::vi2d, olc::Pixel> pMap;
 	AppConsole console;
 
-	olcPGEX_SplashScreen* splashScreen;
-	olc::SOUND::AudioSample* as;
 	int m_sample;
 
-	std::vector<dorkestBaseEntity*> ents;
+	
 
 	bool skipSplash = false;
 	bool toggleWireFrame = false;

@@ -28,12 +28,18 @@ public:
 	}
 
 	template<typename T>
-	T* getComponent()
+	T getComponent()
 	{
-		if (m_reg == nullptr) { error("Null pointer to registry!"); return nullptr; }
+		if (m_reg == nullptr) { error("Null pointer to registry!"); return T(); }
 		//HZ_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 		T retval = m_reg->get<T>(m_handle);
-		return &retval;
+		return retval;
+	}
+
+	template<typename T>
+	void updateComponent(T upval) {
+		if (m_reg == nullptr) { error("Null pointer to registry!"); }
+		m_reg->emplace_or_replace<T>(m_handle,upval);
 	}
 
 	template<typename T>
@@ -66,10 +72,15 @@ public:
 		return !(*this == other);
 	}
 
-	bool isValid() { return m_reg != nullptr && m_handle != entt::null; }
+	bool isValid() {
+		if (m_reg == nullptr) return false;
+
+		return m_handle != entt::null;
+	}//&& m_reg->valid(m_handle);
 	
+	~dorkestBaseEntity() {}
 private:
 	entt::entity m_handle;
-	entt::registry* m_reg{nullptr};
+	entt::registry* m_reg = nullptr;
 
 };

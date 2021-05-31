@@ -134,6 +134,8 @@ public:
 		return *this;
 	}
 
+	//std::string& operator() { return toString(); }
+
 	/**
 	 * Copy operator
 	 * @param rhs Right hand side argument of binary operator.
