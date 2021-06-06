@@ -52,16 +52,23 @@
 #define OLC_PGEX_SOUND
 #define OLC_PGEX_AUDIOCONVERT
 
-#include "Engine.h"
+#include <Engine\Engine.h>
 
-#include "Render/dorkestSpriteManager.h"
+#include <Engine/Render/dorkestSpriteManager.h>
 #include "Util/Math/Vector4.h"
-#include "Util/HitTest.h"
 #include "Extensions\olcPGEX_SplashScreen.h"
 #include "ECS/components.h"
 #include "Util/dorkestProfiler.h"
-#include "Render/dorkestRenderer.h"
+#include <Engine/Render/dorkestRenderer.h>
 #include "ECS/dorkestScene.h"
+
+#include "Util/Math/Vector2.h"
+
+#include "Util/Log.h"
+#include "instPGE.h"
+#include <Util/Math/Geometry/FibSphere.h>
+#include <Util/Color.h>
+
 /*
 Megarev — Today at 2:23 PM
 Calculate the dot product of a given side with the light vector(edited)
@@ -71,12 +78,6 @@ If dot product != 0, then you know light is right in front of it(edited)
 If dot product = 0, then light is not able to reach that face
 
 */
-
-#include "Util/Math/Vector2.h"
-
-#include "Util/Log.h"
-#include "instPGE.h"
-#include <Util/Math/Geometry/FibSphere.h>
 
 /*
 std::string textIn(olc::PixelGameEngine* pge) {
@@ -110,18 +111,23 @@ std::string textIn(olc::PixelGameEngine* pge) {
 
 bool Engine::OnUserCreate()
 {
-	this->scene = new dorkestScene("TEST SCENE");
+	this->scene = new dorkestScene("TEST SCENE", this);
+	//this->scene->setupMap();
 
 	dorkestSpriteMan* dsm = dorkestSpriteMan::getInstance();
 	dsm->addNewSpriteSheet("BasicISO", "./res/ISO/BasicIso.png");
 	dsm->makeDecal("BasicISO");
 
 	dsm->makeDorkestSprite_Decal("basicCube", olc::WHITE, "BasicISO", 1, { 32,32 }, { 64,0 });
-	dsm->makeDorkestSprite_Decal("basicPlane", olc::WHITE, "BasicISO", 1, { 32,32 }, { 96,0 });
 	dsm->makeDorkestSprite_Decal("wireCube", olc::WHITE, "BasicISO", 1, { 32,32 }, { 0,0 });
+
+	dsm->makeDorkestSprite_Decal("basicPlane", olc::WHITE, "BasicISO", 1, { 32,32 }, { 96,0 });
+
 
 	dsm->makeDorkestSprite_Decal("oCube", olc::WHITE, "BasicISO", 1, { 32,32 }, { 0,0 });
 	dsm->makeDorkestSprite_Decal("bpPlane", olc::WHITE, "BasicISO", 1, { 32,32 }, { 32,0 });
+	dsm->makeDorkestSprite_Decal("oPlane", olc::WHITE, "BasicISO", 1, { 32,32 }, { 608,0 });
+
 
 	dsm->makeDorkestSprite_Decal("basicSphere", olc::WHITE, "BasicISO", 1, { 32,32 }, { 576,0 });
 
@@ -135,6 +141,8 @@ bool Engine::OnUserCreate()
 	//olc::SOUND::PlaySample(m_sample,true);
 
 	this->toolwin = new DebugStuff();
+
+
 	return true;
 }
 
@@ -300,7 +308,7 @@ void Engine::renderBlocks() {
 
 	for (const Block &b : blocks) {
 		r->forcedColor = b.c;
-		AABB<float> bb = AABB<float>(b.wPos, { 1,1,1 });
+		AABB3f bb = AABB3f(b.wPos, { 1,1,1 });
 		for (Ray<float> ray : rays) {
 
 			if (HitTest<float>::I3D_ray_aabb(ray, bb)) {
@@ -323,14 +331,19 @@ void Engine::renderRays() {
 */
 
 void drawPlane(Engine* e) {
+	return;
 	for (int x = 0; x < 16; x++)
 		for (int y = 0; y < 16; y++) {
 			debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
-			AABB<float> tbb(Vector3f(x, y, 0), Vector3f(1, 1, 1));
-			std::shared_ptr<dorkestBaseEntity> entp = e->scene->createTerrain(tbb);
-
+			AABB3f tbb(Vector3f(x, y, 0), Vector3f(1, 1, 1));
+			std::shared_ptr<dorkestBaseEntity> entp = e->scene->createTerrain(tbb, "oPlane");
+			if (entp == nullptr) { error("NULL"); continue; }
+			if (!entp->hasComponent<c_baseColor>()) {
+				error("basecolor component missing from entity?");
+				return;
+			}
 			c_baseColor cb = entp->getComponent<c_baseColor>();
-			cb.color = olc::WHITE;
+			cb.color = Colorf(255, 255, 255, 255);
 			entp->updateComponent<c_baseColor>(cb);
 
 			if (entp == nullptr) { error("DBE is null!"); }
@@ -339,10 +352,248 @@ void drawPlane(Engine* e) {
 
 		}
 }
+
+void showCol(int col, int r, Colorf ca, Colorf cb, std::string sign, Colorf cr) {
+	int ax = col;
+	int tx = col + 20;
+	int bx = col + 50;
+	int ex = col + 70;
+	int lx = col + 100;
+
+	instPGE::getInstance()->FillCircle(ax, r, 10, ca);
+	instPGE::getInstance()->DrawString(tx, r - 7, sign, olc::WHITE, 2);
+	instPGE::getInstance()->FillCircle(bx, r, 10, cb);
+	instPGE::getInstance()->DrawString(ex, r - 7, "=", olc::WHITE, 2);
+	instPGE::getInstance()->FillCircle(lx, r, 10, cr);
+
+}
+
+/*
+static bool runbefore = false;
+static std::shared_ptr<Colorf> rcol[10];
+void testColor() {
+
+	if (runbefore == false || instPGE::getInstance()->GetKey(olc::Key::Y).bPressed) {
+		for (int x = 0; x < 10; x++) rcol[x] = nullptr;
+		runbefore = true;
+	}
+
+	Colorf cr, cb, cg, cbl, cw;
+	cr = Colorf(olc::RED);
+	cg = Colorf(olc::GREEN);
+	cb = Colorf(olc::BLUE);
+	cbl = Colorf(olc::BLACK);
+	cw = Colorf(olc::WHITE);
+
+	int r = 100;
+	int rinc = 25;
+	int c = 50;
+
+	showCol(c, r, cr, cb, "+", cr + cb);
+	r += rinc;
+	showCol(c, r, cb, cg, "+", cb + cg);
+	r += rinc;
+	showCol(c, r, cg, cr, "+", cg + cr);
+	r += rinc;
+	showCol(c, r, cw, cr, "+", cw + cr);
+	r += rinc;
+	showCol(c, r, cw, cg, "+", cw + cg);
+	r += rinc;
+	showCol(c, r, cw, cb, "+", cw + cb);
+	r += rinc;
+	showCol(c, r, cbl, cr, "+", cbl + cr);
+	r += rinc;
+	showCol(c, r, cbl, cg, "+", cbl + cg);
+	r += rinc;
+	showCol(c, r, cbl, cb, "+", cbl + cb);
+	r += rinc;
+
+	instPGE::getInstance()->FillRect(c + 120, 90, 10, r - 100, olc::WHITE);
+
+	c += 150;
+
+	r = 100;
+	showCol(c, r, cr, cb, "-", cr - cb);
+	r += rinc;
+	showCol(c, r, cb, cg, "-", cb - cg);
+	r += rinc;
+	showCol(c, r, cg, cr, "-", cg - cr);
+	r += rinc;
+	showCol(c, r, cw, cr, "-", cw - cr);
+	r += rinc;
+	showCol(c, r, cw, cg, "-", cw - cg);
+	r += rinc;
+	showCol(c, r, cw, cb, "-", cw - cb);
+	r += rinc;
+	showCol(c, r, cbl, cr, "-", cbl - cr);
+	r += rinc;
+	showCol(c, r, cbl, cg, "-", cbl - cg);
+	r += rinc;
+	showCol(c, r, cbl, cb, "-", cbl - cb);
+	r += rinc;
+
+	instPGE::getInstance()->FillRect(c + 120, 90, 10, r - 100, olc::WHITE);
+
+	c += 150;
+	r = 100;
+	showCol(c, r, cr, cb, "*", cr * cb);
+	r += rinc;
+	showCol(c, r, cb, cg, "*", cb * cg);
+	r += rinc;
+	showCol(c, r, cg, cr, "*", cg * cr);
+	r += rinc;
+	showCol(c, r, cw, cr, "*", cw * cr);
+	r += rinc;
+	showCol(c, r, cw, cg, "*", cw * cg);
+	r += rinc;
+	showCol(c, r, cw, cb, "*", cw * cb);
+	r += rinc;
+	showCol(c, r, cbl, cr, "*", cbl * cr);
+	r += rinc;
+	showCol(c, r, cbl, cg, "*", cbl * cg);
+	r += rinc;
+	showCol(c, r, cbl, cb, "*", cbl * cb);
+	r += rinc;
+
+	instPGE::getInstance()->FillRect(c + 120, 90, 10, r - 100, olc::WHITE);
+
+	c += 150;
+	r = 100;
+	showCol(c, r, cr, cb, "/", cr / cb);
+	r += rinc;
+	showCol(c, r, cb, cg, "/", cb / cg);
+	r += rinc;
+	showCol(c, r, cg, cr, "/", cg / cr);
+	r += rinc;
+	showCol(c, r, cw, cr, "/", cw / cr);
+	r += rinc;
+	showCol(c, r, cw, cg, "/", cw / cg);
+	r += rinc;
+	showCol(c, r, cw, cb, "/", cw / cb);
+	r += rinc;
+	showCol(c, r, cbl, cr, "/", cbl / cr);
+	r += rinc;
+	showCol(c, r, cbl, cg, "/", cbl / cg);
+	r += rinc;
+	showCol(c, r, cbl, cb, "/", cbl / cb);
+	r += rinc;
+
+	instPGE::getInstance()->FillRect(c + 120, 90, 10, r - 100, olc::WHITE);
+
+	c = 25;
+	Colorf base = olc::BLACK;
+
+	srand(time(NULL));
+	debug("STARTING X Y AVG.");
+	for (int x = 0; x < 10; x++) {
+		if (rcol[x] == nullptr) {
+			int rr = rand() % 255;
+			int rg = rand() % 255;
+			int rb = rand() % 255;
+
+			rcol[x] = std::make_shared<Colorf>(rr, rg, rb, 255);
+
+		}
+		instPGE::getInstance()->FillCircle(c, r, 10, base);
+
+		instPGE::getInstance()->FillCircle(c, r + 30, 10, base.avg(2, base, *rcol[x]));
+
+		instPGE::getInstance()->FillCircle(c, r + 60, 10, *rcol[x]);
+		c += 20;
+
+	}
+	c += 20;
+	debug("DOING thE BIG AVERAGE!!!!");
+	instPGE::getInstance()->FillCircle(c, r + 30, 10, base.avg(10, base, *rcol[0], *rcol[1], *rcol[2], *rcol[3], *rcol[4], *rcol[5], *rcol[6], *rcol[7], *rcol[8], *rcol[9]));
+
+	c += 30;
+
+	base = olc::WHITE;
+
+	srand(time(NULL));
+
+	for (int x = 0; x < 10; x++) {
+		if (rcol[x] == nullptr) {
+			int rr = rand() % 255;
+			int rg = rand() % 255;
+			int rb = rand() % 255;
+
+			rcol[x] = std::make_shared<Colorf>(rr, rg, rb, 255);
+
+		}
+		instPGE::getInstance()->FillCircle(c, r, 10, base);
+
+		instPGE::getInstance()->FillCircle(c, r + 30, 10, base.avg(2, base, *rcol[x]));
+
+		instPGE::getInstance()->FillCircle(c, r + 60, 10, *rcol[x]);
+		c += 20;
+
+	}
+	c += 20;
+
+	instPGE::getInstance()->FillCircle(c, r + 30, 10, base.avg(10, base, *rcol[0], *rcol[1], *rcol[2], *rcol[3], *rcol[4], *rcol[5], *rcol[6], *rcol[7], *rcol[8], *rcol[9]));
+
+
+
+
+}
+*/
+
+void testPoly(Engine* e) {
+	static bool frun = false;
+
+
+	////Test our Vertexes.
+	//static Vert v[10];
+
+	//if (!frun) {
+	//	for (int x = 0; x < 10; x++) {
+	//		v[x].pos = Vector3f((rand() % 20) + 20, (rand() % 20) + 20, 0);
+	//		v[x].col.setRand();
+	//	}
+	//	frun = true;
+	//}
+
+	//for (int x = 0; x < 10; x++) {
+	//	e->scene->getRenderer()->drawVertex(v[x]);
+	//}
+
+	Vert v[3];
+	
+		v[0].pos = Vector3f(23, 0, 0);
+		v[0].col = Colorf(olc::RED);
+
+		v[1].pos = Vector3f(32,0, 0);
+		v[1].col = Colorf(olc::BLUE);
+
+		v[2].pos = Vector3f(32,9, 0);
+		v[2].col = Colorf(olc::GREEN);
+
+	
+	Triangle t(v[0],v[1],v[2]);
+
+	e->scene->getRenderer()->drawTriangle(t);
+
+}
+
 void Engine::doKeys(float fElapsedTime) {
+
+	Vector3f mPos = scene->getCamera()->ScreenToMap(instPGE::getInstance()->GetMousePos());
+
+	scene->getRenderer()->drawSprite(mPos, "basicSphere", dorkestRenderer::DIFFUSE, olc::YELLOW, 1);
 
 	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) {
 		return;
+	}
+
+	if (instPGE::getInstance()->GetKey(olc::Key::Y).bPressed) {
+		this->scene->getRenderer()->forceIgnoreDecal(false);
+
+	}
+
+	if (instPGE::getInstance()->GetKey(olc::Key::T).bHeld) {
+		//testColor();
+		testPoly(this);
 	}
 
 
@@ -370,18 +621,16 @@ void Engine::doKeys(float fElapsedTime) {
 
 	}
 
-	
+
 	static float angle = 0;
 
 	if (instPGE::getInstance()->GetKey(olc::Key::H).bHeld) {
-		
+
 		if (fsphere == nullptr) { fsphere = new FibSphere(600); }
 		for (Vector3f p : this->fsphere->points) {
-			
-			this->scene->getRenderer()->setForcedColor(olc::WHITE);
-			this->scene->getRenderer()->setForcedScale(0.5f);
-			p.rot(0,0,angle);
-			this->scene->getRenderer()->drawToWorld(p.x * 8, p.y * 8, p.z *8 , "basicSphere",dorkestRenderer::DIFFUSE,true,true);
+
+			p.rot(0, 0, angle);
+			this->scene->getRenderer()->drawSprite(Vector3f(p.x * 8, p.y * 8, p.z * 8), "basicSphere", dorkestRenderer::DIFFUSE, Colorf(255, 255, 255, 255));
 		}
 		angle += 50 * fElapsedTime;
 
@@ -425,6 +674,7 @@ void Engine::doKeys(float fElapsedTime) {
 	}
 
 	if (instPGE::getInstance()->GetMouse(0).bPressed) {
+		return;
 		dorkestBaseEntity* newLight = this->scene->createNewEntity();
 
 		LightSource data;
@@ -437,15 +687,18 @@ void Engine::doKeys(float fElapsedTime) {
 		data.quadratic = this->toolwin->getquad();
 
 		newLight->addComponent<c_staticLight>(data);
-		
-		Vector2f vMT = this->scene->getRenderer()->ScreenToMap({ 32.0f,32.0f }, 1, vMouse, { 0, 0 });
 
-		newLight->addComponent<c_position>(Vector3f(vMT.x,vMT.y,0),vMouse);
+		Vector3f vMT = this->scene->getCamera()->ScreenToMap(vMouse);
+
+
+		newLight->addComponent<c_position>(Vector3f(vMT.x, vMT.y, std::max(this->toolwin->getZ(), 1)), vMouse);
 		newLight->addComponent<c_sprite>("basicSphere");
-		newLight->addComponent<c_baseColor>(olc::YELLOW);
+		newLight->addComponent<c_baseColor>(data.color);
+		newLight->addComponent<c_imposter>();
+		newLight->addComponent<c_statusflags>();
 
 		scene->recalcLight();
-		
+
 
 
 	};
@@ -460,8 +713,9 @@ void Engine::doKeys(float fElapsedTime) {
 		ents.clear();
 
 		delete this->scene;
-		this->scene = new dorkestScene("TEST SCENE");
-		drawPlane(this);
+		this->scene = new dorkestScene("TEST SCENE", this);
+		this->scene->setupMap();
+		//drawPlane(this);
 	}
 
 
@@ -480,19 +734,20 @@ void Engine::doKeys(float fElapsedTime) {
 
 
 	if (instPGE::getInstance()->GetMouseWheel() < 0) {
-		
-	} else if (instPGE::getInstance()->GetMouseWheel() > 1) {
-		
+
 	}
-	
+	else if (instPGE::getInstance()->GetMouseWheel() > 1) {
+
+	}
+
 
 }
 
 bool Engine::OnUserUpdate(float fElapsedTime)
 {
-	
+
 	vMouse = instPGE::getInstance()->GetMousePos();
-	vMouseMap = scene->getRenderer()->ScreenToMap({ 32,16 }, 1, vMouse, { 0,0 });
+	vMouseMap = scene->getCamera()->ScreenToMap(vMouse);
 
 	static bool skipSplash = true;
 	//Show splash screen.
@@ -504,7 +759,7 @@ bool Engine::OnUserUpdate(float fElapsedTime)
 
 	instPGE::getInstance()->SetPixelMode(olc::Pixel::ALPHA);
 	instPGE::getInstance()->Clear(olc::GREY);
-	
+
 	doKeys(fElapsedTime);
 	scene->doFrame(fElapsedTime);
 

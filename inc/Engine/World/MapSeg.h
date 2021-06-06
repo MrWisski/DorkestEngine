@@ -8,13 +8,14 @@
 #include "ECS/dorkestBaseEntity.h"
 #include <ECS/TerrainEntity.h>
 
+
 /// <summary>
 /// Just a container for segments of a dorkestScene
 /// </summary>
 class MapSeg {
 public:
 
-	MapSeg(AABB<float> bounds, dorkestScene* parent);
+	MapSeg(AABB3f bounds, dorkestScene* parent);
 	~MapSeg();
 
 	/// <summary>
@@ -34,7 +35,7 @@ public:
 	/// </summary>
 	/// <param name="bounds">The bounding box for the desired entity.</param>
 	/// <returns>A pointer to a new terrain entity. This segment controls the pointer!</returns>
-	std::shared_ptr<dorkestBaseEntity> createTerrainEntity(AABB<float> bounds);
+	std::shared_ptr<dorkestBaseEntity> createTerrainEntity(AABB3f bounds, std::string sprite = "oCube");
 
 	/// <summary>
 	/// Returns a dorkestBaseEntity wrapper for an ENTT handle.
@@ -69,14 +70,20 @@ public:
 	/// </summary>
 	void sort();
 
+	void drawPlane();
+
+	/// <summary>
+	/// Check if this mapseg is empty.
+	/// </summary>
+	/// <returns>true if it has no active entities (empty), false otherwise.</returns>
+	bool isEmpty() { return entReg->alive() == 0; }
+
 	//Let the scene access
 	friend class dorkestScene;
 protected:
-	AABB<float> bBox;
+	AABB3f bBox;
 
-	entt::registry* entities;
-	
-	std::vector<std::shared_ptr<dorkestBaseEntity>> entVec;
+	std::shared_ptr < entt::registry> entReg;
 
 	dorkestScene* owner;
 };

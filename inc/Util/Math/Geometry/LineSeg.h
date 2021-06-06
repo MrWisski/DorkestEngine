@@ -8,8 +8,10 @@
 */
 template <class T>
 class LineSeg2D {
+public:
 	Vector2<T> P1;
 	Vector2<T> P2;
+
 
 	LineSeg2D(Vector2<T> A, Vector2<T> B) : P1(A), P2(B) {}
 
@@ -22,6 +24,7 @@ class LineSeg2D {
 	template <class tOther>
 	void set(LineSeg2D<tOther> O){ P1 = O.P1;  P2 = O.P2; } 
 
+	float length() { return P1.dist(P2); }
 };
 
 /*
@@ -29,6 +32,7 @@ class LineSeg2D {
 */
 template <class T>
 class LineSeg3D {
+public:
 	Vector3<T> P1;
 	Vector3<T> P2;
 
@@ -43,6 +47,7 @@ class LineSeg3D {
 	template <class tOther>
 	void set(LineSeg3D<tOther> O) { P1 = O.P1;  P2 = O.P2; }
 
+	float length() { return P1.dist(P2); }
 
 };
 

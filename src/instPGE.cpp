@@ -4,6 +4,9 @@
 #define PGE_GFX_OPENGL33
 #define OLC_GFX_OPENGL33
 
+//#define OLC_GFX_DIRECTX11
+//#define OLC_GFX_DIRECTX11_FLIP_DISCARD //requires windows 10
+
 #include "instPGE.h"
 
 

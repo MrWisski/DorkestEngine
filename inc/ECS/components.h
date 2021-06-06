@@ -4,7 +4,8 @@
 #include <olcPixelGameEngine.h>
 #include "Util/Log.h"
 #include <Util/Math/Geometry/AABB.h>
-#include <World/Light.h>
+#include <Engine/World/Light.h>
+#include <Util/Color.h>
 
 /// <summary>
 /// Dorkest Engine ECS Nametag Component
@@ -32,11 +33,11 @@ public:
 struct c_position {
 public:
 	Vector3f worldPos = { 0,0,0 };
-	Vector2i screenPos = {0,0};
+	Vector2i screenPos = { 0,0 };
 	bool init = false;
 
 	c_position() = default;
-	c_position(const c_position & pos) = default;
+	c_position(const c_position& pos) = default;
 	c_position(const Vector3f& wPos, const Vector2i& sPos) : worldPos(wPos), screenPos(sPos) { init = true; }
 
 	operator Vector3f () { return worldPos; }
@@ -47,24 +48,33 @@ public:
 	operator Vector2i () { return screenPos; }
 	operator Vector2i& () { return screenPos; }
 	operator const Vector2i& () const { return screenPos; }
+
+	bool operator < (c_position rhs) {
+		if (screenPos.y == rhs.screenPos.y)
+			if (screenPos.x == rhs.screenPos.x)
+				if (worldPos.y == rhs.worldPos.y)
+					return worldPos.z < rhs.worldPos.z;
+				else return worldPos.y < rhs.worldPos.y;
+			else return screenPos.x < rhs.screenPos.x;
+		else return screenPos.y < rhs.screenPos.y;
+	}
 };
 
 /// <summary>
 /// Dorkest Engine ECS Base Color Component
 /// Stores the base color of an entity that includes it for rendering.
 /// </summary>
-
 struct c_baseColor {
 public:
-	olc::Pixel color;
+	Colorf color;
 	bool init = false;
 
 	c_baseColor() = default;
 	c_baseColor(const c_baseColor& color) = default;
-	c_baseColor(const olc::Pixel& color) : color(color) { init = true; }
+	c_baseColor(const Colorf& color) : color(color) { init = true; }
 
-	operator olc::Pixel& () { return color; }
-	operator const olc::Pixel& () const { return color; }
+	operator Colorf& () { return color; }
+	operator const Colorf& () const { return color; }
 
 };
 
@@ -79,7 +89,7 @@ public:
 	bool init = false;
 
 	c_sprite() = default;
-	c_sprite(const c_sprite & tag) = default;
+	c_sprite(const c_sprite& tag) = default;
 	c_sprite(const std::string& spriteName) : spriteName(spriteName) { init = true; }
 
 	operator std::string& () { return spriteName; }
@@ -98,9 +108,9 @@ public:
 	bool init = false;
 
 	c_imposter() = default;
-	c_imposter(const c_imposter & tag) = default;
+	c_imposter(const c_imposter& tag) = default;
 	c_imposter(olc::Decal* imposter) : imposter(imposter) { init = true; }
-	~c_imposter() {if (imposter != nullptr) delete imposter;}
+	~c_imposter() { if (imposter != nullptr) delete imposter; }
 
 	operator olc::Decal* () { return imposter; }
 	operator const olc::Decal* () const { return imposter; }
@@ -114,21 +124,8 @@ public:
 struct c_statusflags {
 public:
 	bool init = true;
-	struct FLAGS_A {
-		bool isNew = true;
-		bool needsImposter = false;
-		bool UNUSED_2;
-		bool UNUSED_3;
-		bool UNUSED_4;
-		bool UNUSED_5;
-		bool UNUSED_6;
-		bool UNUSED_7;
-	};
-	
-	union {
-		FLAGS_A flagBits;
-		unsigned char FlagByte;
-	} Bank_A;
+	bool isNew = true;
+	bool needsImposter = false;
 
 	c_statusflags() = default;
 	c_statusflags(const c_statusflags& tag) = default;
@@ -136,22 +133,42 @@ public:
 };
 
 /// <summary>
-/// AABB Component
-/// Stores an AABB for the entity.
+/// 3D AABB Component
+/// Stores a 3d AABB for the entity.
 /// </summary>
-struct c_aabb {
+struct c_aabb3 {
 public:
-	AABB<float> bBox;
+	AABB3f bBox;
 	bool init = false;
 
-	c_aabb() = default;
-	c_aabb(const c_aabb& tag) = default;
+	c_aabb3() = default;
+	c_aabb3(const c_aabb3& tag) = default;
 
-	c_aabb(AABB<float> boundingBox) : bBox(boundingBox) { init = true; }
-	~c_aabb() {}
+	c_aabb3(AABB3f boundingBox) : bBox(boundingBox) { init = true; }
+	~c_aabb3() {}
 
-	operator AABB<float> () { return bBox; }
-	operator const AABB<float> () const { return bBox; }
+	operator AABB3f () { return bBox; }
+	operator const AABB3f() const { return bBox; }
+
+};
+
+/// <summary>
+/// 2D AABB Component
+/// Stores a 2D AABB for the entity.
+/// </summary>
+struct c_aabb2 {
+public:
+	AABB2f bBox;
+	bool init = false;
+
+	c_aabb2() = default;
+	c_aabb2(const c_aabb2& tag) = default;
+
+	c_aabb2(AABB2f boundingBox) : bBox(boundingBox) { init = true; }
+	~c_aabb2() {}
+
+	operator AABB2f () { return bBox; }
+	operator const AABB2f() const { return bBox; }
 
 };
 
@@ -176,7 +193,7 @@ public:
 };
 
 /// <summary>
-/// A component indicating the entity emits light.
+/// A component indicating the entity emits light, but never changes.
 /// </summary>
 struct c_staticLight {
 public:
@@ -194,7 +211,7 @@ public:
 };
 
 /// <summary>
-/// A component indicating the entity emits light.
+/// A component indicating the entity emits light, and that source might change at any time.
 /// </summary>
 struct c_dynamicLight {
 public:
@@ -230,4 +247,3 @@ public:
 };
 
 
- 

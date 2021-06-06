@@ -424,6 +424,9 @@ public:
 		return (*this) + (r - (*this)) * fact;
 	}
 
+	float dist(Vector2<T> other) {
+		return sqrt(pow(other.x - x, 2) + pow(other.y - y, 2) * 1.0);
+	}
 	//-------------[ conversion ]-----------------------------
 	/**
 	 * Conversion to pointer operator

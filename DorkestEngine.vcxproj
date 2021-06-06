@@ -174,25 +174,28 @@
     <ClCompile Include="src\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\CPP_DEV_LIBS\olcPixelGameEngine-master\Extensions\olcPGEX_DX11ShadersPlus.h" />
     <ClInclude Include="inc\ECS\components.h" />
     <ClInclude Include="inc\ECS\dorkestBaseEntity.h" />
     <ClInclude Include="inc\ECS\dorkestScene.h" />
     <ClInclude Include="inc\ECS\Systems\RenderSystem.h" />
     <ClInclude Include="inc\ECS\TerrainEntity.h" />
-    <ClInclude Include="inc\Engine.h" />
+    <ClInclude Include="inc\Engine\Engine.h" />
     <ClInclude Include="inc\instPGE.h" />
-    <ClInclude Include="inc\Render\dorkestCamera.h" />
-    <ClInclude Include="inc\Render\dorkestSprite.h" />
-    <ClInclude Include="inc\Render\dorkestSpriteManager.h" />
-    <ClInclude Include="inc\Render\dorkestRenderer.h" />
-    <ClInclude Include="inc\imguiWindows\DebugIMGUI.h" />
+    <ClInclude Include="inc\Engine\Render\dorkestCamera.h" />
+    <ClInclude Include="inc\Engine\Render\dorkestSprite.h" />
+    <ClInclude Include="inc\Engine\Render\dorkestSpriteManager.h" />
+    <ClInclude Include="inc\Engine\Render\dorkestRenderer.h" />
+    <ClInclude Include="inc\Engine\imguiWindows\DebugIMGUI.h" />
+    <ClInclude Include="inc\Util\Color.h" />
     <ClInclude Include="inc\Util\dorkestProfiler.h" />
     <ClInclude Include="inc\Util\Math\Geometry\AABB.h" />
-    <ClInclude Include="inc\imguiWindows\ConsoleIMGUI.h" />
+    <ClInclude Include="inc\Engine\imguiWindows\ConsoleIMGUI.h" />
     <ClInclude Include="inc\Util\Log.h" />
-    <ClInclude Include="inc\Util\HitTest.h" />
     <ClInclude Include="inc\Util\Math\Geometry\FibSphere.h" />
+    <ClInclude Include="inc\Util\Math\Geometry\Point.h" />
     <ClInclude Include="inc\Util\Math\Geometry\LineSeg.h" />
+    <ClInclude Include="inc\Util\Math\Geometry\nGons.h" />
     <ClInclude Include="inc\Util\Math\Matrix3.h" />
     <ClInclude Include="inc\Util\Math\Matrix4.h" />
     <ClInclude Include="inc\Util\Math\Geometry\Plane.h" />
@@ -204,9 +207,9 @@
     <ClInclude Include="inc\Util\Status.h" />
     <ClInclude Include="inc\Util\Math\Vector2.h" />
     <ClInclude Include="inc\Util\Math\Vector3.h" />
-    <ClInclude Include="inc\World\dorkestMap.h" />
-    <ClInclude Include="inc\World\Light.h" />
-    <ClInclude Include="inc\World\MapSeg.h" />
+    <ClInclude Include="inc\Engine\World\dorkestMap.h" />
+    <ClInclude Include="inc\Engine\World\Light.h" />
+    <ClInclude Include="inc\Engine\World\MapSeg.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="res\CantinaBand3.wav" />

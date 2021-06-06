@@ -99,7 +99,7 @@ public:
 	bool toggle;
 	olc::Pixel cellcolor;
 	Vector2i vMouse;
-	Vector2i vMouseMap;
+	Vector3f vMouseMap;
 
 	int moveposx = 0;
 	int moveposy = 0;

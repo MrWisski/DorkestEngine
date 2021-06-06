@@ -33,7 +33,7 @@ public:
 	static olc::Pixel mixColors(olc::Pixel color_a, olc::Pixel color_b, std::string mode = "mix", float t = -1.0f, float gamma = 2.2f) {
 	
 		assert(mode == "mix" || mode == "blend");
-		
+	
 		if (t == -1.0f) {
 			if (mode == "mix") t = 0.5f;
 			else t = 0;
@@ -71,16 +71,20 @@ public:
 			ret = (color_a * (tinv)) + (color_b * t);
 		}
 		else if (mode == "blend") {
-			/*
+			
 			float alpha_a = color_a.a * (tinv);
 			float a = 1 - (1 - alpha_a) * (1 - color_b.a);
-			float s = color_b.a * (1 - alpha_a) / a
-				if gamma in(1., None) :
-					r, g, b, _ = (1 - s) * color_a + s * color_b
-					elif gamma > 0:
-			r, g, b, _ = np.power((1 - s) * color_a * *gamma + s * color_b * *gamma,
-				1 / gamma)
-				*/
+			float s = color_b.a * (1 - alpha_a) / a;
+
+				if (gamma == 1 || gamma == 0) {
+					ret = (color_a + (color_b * s)) * (1 - s);
+				} else {
+					float nr = std::powf(std::powf(color_a.r,gamma) + (std::powf(color_b.r,gamma)*s) * (1 - s), 1 / gamma);
+					float ng = std::powf(std::powf(color_a.g, gamma) + (std::powf(color_b.g, gamma) * s) * (1 - s), 1 / gamma);
+					float nb = std::powf(std::powf(color_a.b, gamma) + (std::powf(color_b.b, gamma) * s) * (1 - s), 1 / gamma);
+					ret = olc::Pixel(nr, ng, nb, a);
+				}
+				
 		}
 
 

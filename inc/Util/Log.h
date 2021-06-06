@@ -55,7 +55,7 @@
 #include <string>
 #include <map>
 
-#include "../imguiWindows/ConsoleIMGUI.h"
+#include <Engine/imguiWindows/ConsoleIMGUI.h>
 
 
 //Make some global defines to make logging simple and painless.
@@ -63,11 +63,40 @@
 #define info(msg) Log::Instance()->_info(msg, __FUNCTION__);
 #define debug(msg) Log::Instance()->_debug(msg, __FUNCTION__);
 
+#define debugss *(Log::Instance()->d_stream())
+#define infoss *(Log::Instance()->i_stream())
+#define errorss *(Log::Instance()->e_stream())
+
 
 class Log
 {
 public:
-   
+    using Stream = std::ostringstream;
+    using Buffer_p = std::unique_ptr<Stream, std::function<void(Stream*)>>;
+
+    Buffer_p d_stream() {
+        return Buffer_p(new Stream, [&](Stream* st) {
+            *st << std::endl;
+            if (Log::Instance()->debugflags.end() == Log::Instance()->debugflags.find("[DEBUG STREAM]")) Log::Instance()->debugflags["[DEBUG STREAM]"] = true;
+            logStream(DEBUG, st->str());
+            });
+    }
+
+    Buffer_p i_stream() {
+        return Buffer_p(new Stream, [&](Stream* st) {
+            if (Log::Instance()->infoflags.end() == Log::Instance()->infoflags.find("[INFO STREAM]")) Log::Instance()->infoflags["[INFO STREAM]"] = true;
+            logStream(INFO, st->str());
+            });
+    }
+
+    Buffer_p e_stream() {
+        return Buffer_p(new Stream, [&](Stream* st) {
+
+            if (Log::Instance()->errorflags.end() == Log::Instance()->errorflags.find("[ERROR STREAM]")) Log::Instance()->errorflags["[ERROR STREAM]"] = true;
+            logStream(ERR, st->str());
+            });
+    }
+
     AppConsole* imguiconsole;
 
     enum log_type
@@ -88,6 +117,8 @@ public:
     void _info(std::string msg, std::string caller);
     void _debug(std::string msg, std::string caller);
     void _error(std::string msg, std::string caller);
+    
+
     void save();
     void disableEntry(std::string cname);
     void enableEntry(std::string cname);
@@ -134,6 +165,7 @@ private:
     std::string fName;
     //Does the actual heavy lifting of saving the log messages to our std::vector
     void log(log_type p_type, std::string caller,std::string p_msg);
+    void logStream(log_type p_type, std::string p_msg);
     //Our instance.
     static Log* instance;
     //bool to indicate if we're outputting to the console.

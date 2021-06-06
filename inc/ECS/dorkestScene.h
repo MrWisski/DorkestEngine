@@ -2,7 +2,7 @@
 #include "instPGE.h"
 #include <entt/entity/registry.hpp>
 #include "dorkestBaseEntity.h"
-#include "Render/dorkestCamera.h"
+#include <Engine/Render/dorkestCamera.h>
 #include "Util/dorkestProfiler.h"
 #include <Util/Math/Geometry/AABB.h>
 
@@ -14,18 +14,18 @@ class MapSeg;
 //The size that a mapseg initializes to (16x16x16)
 const int SEGMENT_DIMENSION = 16;
 //The max size mapseg map dimension (8x8)
-const int MAX_MAPSEG_DIMENSION = 16;
+const int MAX_MAPSEG_DIMENSION = 8;
 
 //an 8x8 of 16x16x16 yields 4,000 meters per side.
 
 
 class dorkestScene {
 public:
-	dorkestScene(std::string name);
+	dorkestScene(std::string name, Engine* e);
 
-	dorkestRenderer* getRenderer();
+	std::shared_ptr < dorkestRenderer> getRenderer();
 	void setCameraCenter(float x, float y, float z);
-	dorkestCamera* getCamera();
+	std::shared_ptr <dorkestCamera> getCamera();
 
 	/// <summary>
 	/// Forces the scene to recalculate lighting.
@@ -50,7 +50,7 @@ public:
 	/// </summary>
 	/// <param name="bounds">The bounding box of the terrain (Restricted to 1x1x1 max!)</param>
 	/// <returns>A TerrainEntity wrapper if successful, nullptr if not.</returns>
-	std::shared_ptr<dorkestBaseEntity> createTerrain(AABB<float> bounds);
+	std::shared_ptr<dorkestBaseEntity> createTerrain(AABB3f bounds, std::string sprite = "oCube");
 
 	/// <summary>
 	/// retrieves a dorkestBaseEntity from the registry.
@@ -64,15 +64,20 @@ public:
 	/// </summary>
 	void setDirty();
 
+	/// <summary>
+	/// Tells the scene to set up its map.
+	/// Should only ever be called once, immediately after new dorkestScene(...);
+	/// </summary>
+	void setupMap();
 
 	~dorkestScene();
 private:
-	entt::registry* sceneReg;
+	std::shared_ptr<entt::registry> sceneReg;
 	std::string name = "INVALID";
 	bool regClean = false;
-	dorkestCamera* cam = nullptr;
-	dorkestRenderer* r = nullptr;
+	std::shared_ptr <dorkestCamera> cam = nullptr;
+	std::shared_ptr <dorkestRenderer> r = nullptr;
 
-	dorkestMap* map = nullptr;
+	std::shared_ptr < dorkestMap> map = nullptr;
 	//std::vector<MapSeg*> map;
 };

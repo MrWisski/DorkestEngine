@@ -11,6 +11,6 @@ public:
 
 private:
 	MapSeg* map[MAX_MAPSEG_DIMENSION * MAX_MAPSEG_DIMENSION];
-
+	dorkestScene* parent;
 };
 

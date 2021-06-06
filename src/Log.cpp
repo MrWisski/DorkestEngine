@@ -126,12 +126,8 @@ void Log::toggleShowHide()
 
 void Log::log(log_type p_type, std::string caller,std::string p_msg)
 {
-    if(caller == "::")
-    {
-        std::cout << "setting caller to Main\n";
-        caller = "Main";
-        std::cout << "Caller set to main. \n";
-    }
+    if(caller == "::") caller = "Main";
+
     if(Log::Instance()->logflags.end() == Log::Instance()->logflags.find(caller))
     {
         Log::Instance()->logflags[caller] = true;
@@ -140,7 +136,7 @@ void Log::log(log_type p_type, std::string caller,std::string p_msg)
     //Are we even saving the logs from this module??
     if(Log::Instance()->logflags[caller] == false)
     {
-        //std::cout << "We ARE NOT saving logs from " + caller << std::endl;
+        std::cout << "We ARE NOT saving logs from " + caller << std::endl;
         return;
     }
     //std::cout << "We ARE saving logs from " + caller << std::endl;
@@ -209,6 +205,76 @@ void Log::log(log_type p_type, std::string caller,std::string p_msg)
         std::cout << msg << std::endl;
     }
     m_messages.push_back(timestr+msg);
+    imguiconsole->AddLog(msg.c_str());
+}
+
+void Log::logStream(log_type p_type, std::string p_msg)
+{
+    
+    //Are we even saving the specific type logs from this module??
+    switch (p_type)
+    {
+    case ERR:
+        if (Log::Instance()->errorflags["[ERROR STREAM]"] == false)
+        {
+            std::cout << "Aborting error message." << std::endl;
+            return;
+        }
+
+        break;
+    case INFO:
+        if (Log::Instance()->infoflags["[INFO STREAM]"] == false)
+        {
+            std::cout << "Aborting info message." << std::endl;
+            return;
+        }
+
+        break;
+    case DEBUG:
+        if (Log::Instance()->debugflags["[DEBUG STREAM]"] == false)
+        {
+            std::cout << "Aboorting debug message." << std::endl;
+            return;
+        }
+
+        break;
+    }
+
+    //std::cout << "Building time info.\n";
+    time_t rawtime;
+    struct tm timeinfo;
+    char buffer[80];
+    std::string timestr;
+
+    time(&rawtime);
+    localtime_s(&timeinfo, &rawtime);
+
+    strftime(buffer, 80, "%I:%M:%S", &timeinfo);
+
+    std::string str(buffer);
+    timestr = buffer;
+
+    std::string msg = "";
+
+    switch (p_type)
+    {
+    case ERR:
+        msg += "[ERROR STREAM]\t";
+        break;
+    case INFO:
+        msg += "[Info Stream]\t";
+        break;
+    case DEBUG:
+        msg += "[Debug Stream]\t";
+        break;
+    }
+
+    msg += p_msg;
+    if (Log::Instance()->console == true)
+    {
+        std::cout << msg ;
+    }
+    m_messages.push_back(timestr + msg);
     imguiconsole->AddLog(msg.c_str());
 }
 

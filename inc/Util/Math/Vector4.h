@@ -35,60 +35,8 @@ template<class T>
 class Vector4
 {
 public:
+	T x, y, z, w;
 
-	union
-	{
-		/**
-		 * First element of vector, alias for R-coordinate.
-		 * For color notation.
-		 */
-		T r
-			/**
-			 * First element of vector, alias for X-coordinate.
-			 */;
-		T x;
-	};
-
-	union
-	{
-		/**
-		 * Second element of vector, alias for G-coordinate.
-		 * For color notation.
-		 */
-		T g;
-		/**
-		 * Second element of vector, alias for Y-coordinate.
-		 */
-		T y;
-	};
-
-	union
-	{
-		/**
-		 * Third element of vector, alias for B-coordinate.
-		 * For color notation.
-		 */
-		T b;
-		/**
-		 * Third element of vector, alias for Z-coordinate.
-		 */
-		T z;
-	};
-
-	union
-	{
-		/**
-		 * Fourth element of vector, alias for A-coordinate.
-		 * For color notation. This represnt aplha chanell
-		 */
-		T a;
-		/**
-		 * First element of vector, alias for W-coordinate.
-		 * @note For vectors (such as normals) should be set to 0.0
-		 * For vertices should be set to 1.0
-		 */
-		T w;
-	};
 
 	//----------------[ constructors ]--------------------------
 	/**
@@ -129,10 +77,6 @@ public:
 		: x(static_cast<T>(src.x)), y(static_cast<T>(src.y)), z(static_cast<T>(src.z)), w(static_cast<T>(src.w))
 	{
 	}
-
-	Vector4(olc::Pixel color) : r(color.r), g(color.g), b(color.b), a(color.a) {}
-	//std::string& operator() { return toString(); }
-
 
 	//----------------[ access operators ]-------------------
 	/**

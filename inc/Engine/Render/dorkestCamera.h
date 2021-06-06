@@ -1,5 +1,5 @@
 /*
-	Name : Dorkest Renderer
+	Name : Dorkest Camera
 	Created : 5/26/2021
 	Author : MrWisski
 	License : (WISSKI-1)
@@ -49,69 +49,92 @@
 	YOU ARE LOCATED.
 */
 #pragma once
-#include<vector>
+#include <Util/Math/Vector3.h>
+#include <Util/Math/Matrix3.h>
+#include <Util/Math/Geometry/AABB.h>
+/*
+Camera with settings for 3D viewing
+ - orthogonal mode with x, y and z borders
+ - perspective mode with fov, aspect, far and near
+ - orthogonal mode can also use fov and aspect if wished
+*/
 
-#include "Util/Math/Vector2.h"
-#include "Util/Math/Vector3.h"
-#include "dorkestCamera.h"
-#include "dorkestSprite.h"
-#include "Util/Math/Geometry/LineSeg.h"
-#include "Util/Math/Geometry/AABB.h"
-
-class dorkestSprite;
-
-
-
-class dorkestRenderer {
-public:
-	
-	
-	enum sType { DIFFUSE = 64, NORMAL = 32, WIRE = 0 };
-
-	void setCam(dorkestCamera* cam) { this->cam = cam; }
-	void setForcedColor(olc::Pixel c) { this->forcedColor = c; }
-	void setForcedSpriteSize(Vector2f newSize) { this->forceSize = newSize; }
-	void setForcedScale(float newScale) { this->forceScale = newScale; }
-	dorkestCamera* getCamera() { if (this->cam != nullptr) return this->cam; else error("getCamera RETURNING NULL"); return nullptr; }
-	Vector3d PixelToNormal(int r, int g, int b);
-	
-	olc::vi2d MapToScreen(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
-	olc::vf2d ScreenToMap(Vector2f vTileSize, float scaleFactor, Vector2f m, Vector2f offset);
-	
-	bool drawToScreen(float ScreenX, float ScreenY, std::string name, sType spriteType = sType::DIFFUSE, bool ForceColor = false, bool ForceScale = false, bool ForceSize = false);
-	bool drawToWorld(float WorldX, float WorldY, float WorldZ, std::string name, sType spriteType = sType::DIFFUSE, bool ForceColor = false, bool ForceScale = false, bool ForceSize = false);
-
-	/* Draws a ray */
-	void draw(Ray<float> ray);
-	/* Draws a line in screenspace. */
-	void draw(LineSeg2Di line);
-	/* Draws a line in worldspace. */
-	void draw(LineSeg3Df line);
-	/* Draws a Bounding Box */
-	void draw(AABB<float> box);
-
-
-	void drawRay(Ray<float> ray);
-
-	void screenLineW(Vector3i from, Vector3i to, olc::Pixel col);
-
-	void screenLine(Vector2i from, Vector2i to, olc::Pixel col);
-
-	void line3D(Vector3i from, Vector3i to, olc::Pixel col);
-
-	void doRender(float fElapsedTime);
-	
-
-	dorkestRenderer() = default;
-	~dorkestRenderer() = default;
-	friend class dorkestScene;
-protected:
-	bool drawDecal(Vector2f dest, Vector2f destSize, olc::Decal*, Vector2f src, Vector2f srcSize, olc::Pixel color);
-	bool drawSprite(Vector2f dest, int scale, olc::Sprite*, Vector2f src, Vector2f srcSize);
+class dorkestCamera
+{
 private:
-	dorkestCamera* cam = nullptr;
-	olc::Pixel forcedColor = olc::BLACK;
-	float forceScale = 1.0f;
-	Vector2f forceSize = {32,32};
+	// camera parameters
+	Vector3f center_;
+	Vector3f lookat_;
+	Vector3f lookup_;
 
+	//bounding
+	AABB3f bb;
+	AABB2f bb2d;
+	// is camera in orthogonal mode and shall fov be used
+	/// true  = orthogonal
+	/// false = perspective
+	bool orthogonal_;
+	bool useFov_;
+
+	// screen size, also used for aspect calculation
+	int sWidth_;
+	int sHeight_;
+
+	// viewport width and height for orthogonal if fov_ not used
+	float vWidth_;
+	float vHeight_;
+
+	// far and near positions
+	float near_;
+	float far_;
+
+	// field of vision in degree for perspective and maybe for orthogonal
+	float fov_;
+
+public:
+	dorkestCamera();
+	dorkestCamera(const dorkestCamera& src);
+	virtual ~dorkestCamera();
+
+	Vector2i iTOc(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
+	Vector3f cTOi(Vector2f vTileSize, float scaleFactor, Vector2f screen, Vector2f offset);
+
+	Vector2i MapToScreen(Vector3f map);
+	Vector3f ScreenToMap(Vector2i screen);
+
+
+
+	void setScreenSize(int width, int height);
+	void setCameraParameters(float xc, float yc, float zc, float xl, float yl, float zl, float xu = 0.0, float yu = 1.0, float zu = 1.0);
+	void setCenter(float x, float y, float z);
+	void setLookat(float x, float y, float z);
+	void setLookUp(float x, float y, float z);
+
+	// sets parameters for orthogonal
+	void setOrthogonal(float width, float height, float near, float far);
+	void setOrthoFov(float fov);
+
+	// sets parameters for perspective
+	void setPerspective(float fov, float near, float far);
+
+	void setPerspectiveMode();
+	void setOrthogonalMode(bool useFov = false);
+
+	// copy all settings from existing camera
+	void copyCameraSettings(const dorkestCamera& camera);
+
+	int getScreenWidth();
+	int getScreenHeight();
+
+	Vector3f getCenter();
+
+	float getMaxDepth();
+	float getNearPlane();
+
+	float getFov();
+
+
+	Matrix3f getLookatMatrix();
+	Matrix3f getProjectionMatrix();
+	Matrix3f getScreenMatrix();
 };

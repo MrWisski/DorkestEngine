@@ -2,7 +2,9 @@
 
 #include "olcPixelGameEngine.h"
 #include "Extensions\imgui_impl_pge.h"
-#include "Engine.h"
+#include <Extensions/olcPGEX_Graphics3D.h>
+
+#include <Engine\Engine.h>
 
 class Engine;
 

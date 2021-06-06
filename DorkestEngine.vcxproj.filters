@@ -68,7 +68,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\Engine.h">
+    <ClInclude Include="inc\Engine\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Util\Log.h">
@@ -92,10 +92,10 @@
     <ClInclude Include="inc\Util\Math\Geometry\AABB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\imguiWindows\ConsoleIMGUI.h">
+    <ClInclude Include="inc\Engine\imguiWindows\ConsoleIMGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Render\dorkestRenderer.h">
+    <ClInclude Include="inc\Engine\Render\dorkestRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\instPGE.h">
@@ -104,13 +104,13 @@
     <ClInclude Include="inc\Util\Math\Geometry\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Render\dorkestCamera.h">
+    <ClInclude Include="inc\Engine\Render\dorkestCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Render\dorkestSprite.h">
+    <ClInclude Include="inc\Engine\Render\dorkestSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Render\dorkestSpriteManager.h">
+    <ClInclude Include="inc\Engine\Render\dorkestSpriteManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Util\Math\Vector4.h">
@@ -125,10 +125,7 @@
     <ClInclude Include="inc\Util\Math\Geometry\Quaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Util\HitTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\imguiWindows\DebugIMGUI.h">
+    <ClInclude Include="inc\Engine\imguiWindows\DebugIMGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Util\Math\Geometry\Plane.h">
@@ -152,19 +149,31 @@
     <ClInclude Include="inc\Util\dorkestProfiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\World\MapSeg.h">
+    <ClInclude Include="inc\Engine\World\MapSeg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\ECS\TerrainEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\World\Light.h">
+    <ClInclude Include="inc\Engine\World\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\World\dorkestMap.h">
+    <ClInclude Include="inc\Engine\World\dorkestMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Util\Math\Geometry\FibSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Util\Math\Geometry\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Util\Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Util\Math\Geometry\nGons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CPP_DEV_LIBS\olcPixelGameEngine-master\Extensions\olcPGEX_DX11ShadersPlus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

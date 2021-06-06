@@ -1,15 +1,15 @@
 #include "ECS/dorkestScene.h"
-#include "Render/dorkestCamera.h"
+#include <Engine/Render/dorkestCamera.h>
 #include "ECS/dorkestBaseEntity.h"
 #include "ECS/components.h"
 #include "instPGE.h"
-#include "Render/dorkestRenderer.h"
-#include <World/dorkestMap.h>
-#include <World/MapSeg.h>
+#include <Engine/Render/dorkestRenderer.h>
+#include <Engine/World/dorkestMap.h>
+#include <Engine/World/MapSeg.h>
 
-dorkestRenderer* dorkestScene::getRenderer() { return this->r; }
-void dorkestScene::setCameraCenter(float x, float y, float z) { this->r->getCamera()->setCenter(x, y, z); }
-dorkestCamera* dorkestScene::getCamera() { return this->r->getCamera(); }
+std::shared_ptr<dorkestRenderer> dorkestScene::getRenderer() { return this->r; }
+void dorkestScene::setCameraCenter(float x, float y, float z) { this->getCamera()->setCenter(x, y, z); }
+std::shared_ptr < dorkestCamera> dorkestScene::getCamera() { return this->cam; }
 
 void dorkestScene::recalcLight()
 {
@@ -46,15 +46,28 @@ void dorkestScene::setDirty()
 	this->regClean = false;
 }
 
+void dorkestScene::setupMap()
+{
+	auto seg = map->get(MAX_MAPSEG_DIMENSION / 2, MAX_MAPSEG_DIMENSION / 2);
+
+	Vector2f tm = this->cam->MapToScreen(seg->bBox.getLocation() + (SEGMENT_DIMENSION / 2));
+	debug(tm.toString());
+	cam->setCenter(tm.x,tm.y, 0);
+	
+	
+
+	this->regClean = false;
+}
+
 dorkestScene::~dorkestScene() {
 	debug("Disposing of scene " + name);
 	
-	if (cam != nullptr) { delete cam; }
-	if (r != nullptr) { delete r; }
-	if (this->map != nullptr) delete map;
+	if (cam != nullptr) cam.reset();
+	if (r != nullptr) r.reset(); 
+	if (this->map != nullptr) map.reset();
 
 	sceneReg->clear();
-	delete sceneReg;
+	sceneReg.reset();
 }
 dorkestBaseEntity* dorkestScene::createNewEntity() {
 
@@ -63,17 +76,22 @@ dorkestBaseEntity* dorkestScene::createNewEntity() {
 	return newE;
 }
 
-std::shared_ptr<dorkestBaseEntity> dorkestScene::createTerrain(AABB<float> bounds)
+std::shared_ptr<dorkestBaseEntity> dorkestScene::createTerrain(AABB3f bounds, std::string sprite)
 {
+	debug("Checking who owns the area of these bounds....");
 	//Check to see if we have any mapsegs that can take this block.
 	for (int x = 0; x < MAX_MAPSEG_DIMENSION; x++)
 		for (int y = 0; y < MAX_MAPSEG_DIMENSION; y++) {
+			assert(this->map != nullptr);
 
+			if (this->map->get(x, y) == nullptr) { error("map seg is null"); continue; }
 			if (this->map->get(x, y)->bBox.contains(bounds)) {
 				//We found one!
 
 				regClean = false;
-				return this->map->get(x, y)->createTerrainEntity(bounds);
+				auto seg = this->map->get(x, y);
+
+				return seg->createTerrainEntity(bounds,sprite);
 			}
 		}
 
@@ -85,24 +103,48 @@ std::shared_ptr<dorkestBaseEntity> dorkestScene::getEntity(entt::entity ent) {
 }
 
 
-dorkestScene::dorkestScene(std::string name) {
+dorkestScene::dorkestScene(std::string name,Engine* e) {
 	this->name = name;
-	sceneReg = new entt::registry();
-	this->cam = new dorkestCamera();
-	this->r = new dorkestRenderer();
-	this->r->setCam(cam);
-	r->getCamera()->setScreenSize(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y);
-	r->getCamera()->setCenter(cam->getScreenWidth() / 2.0f, cam->getScreenHeight() / 2.0f, 0);
-	r->getCamera()->setOrthogonal(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y, 0, 1);
+	sceneReg = std::make_unique<entt::registry>();
+	this->cam = std::make_shared<dorkestCamera>();
+	this->r = std::make_shared<dorkestRenderer>(this->cam);
 
-	map = new dorkestMap(this);
+	this->r->setCam(cam);
+	getCamera()->setScreenSize(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y);
+	
+	getCamera()->setOrthogonal(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y, 0, 1);
+	
+	
+	map = std::make_unique <dorkestMap>(this);
+	auto seg = map->get(MAX_MAPSEG_DIMENSION / 2, MAX_MAPSEG_DIMENSION / 2);
+	getCamera()->setCenter(seg->bBox.getLocation().x + SEGMENT_DIMENSION/2, seg->bBox.getLocation().y + SEGMENT_DIMENSION / 2, 0);
 
 	debug("Scene " + name + " is ready for use!");
 }
 
 bool dorkestScene::doFrame(float fElapsedTime) {
 	dorkestDataPoint dp("DoFrame");
+
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
+	//+	Initialize
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
+
 	auto sceneView = sceneReg->view<c_position, c_baseColor, c_sprite, c_imposter, c_statusflags>();
+
+	//TODO : This should be a variable gotten from ENGINE.
+	Vector3f mMap = cam->ScreenToMap(instPGE::getInstance()->GetMousePos());
+
+	//Set up our debug HUD stuff.
+	//TODO : Move this somewhere sensible, PLEASE
+	r->drawTextRow(0, "Cam Center : " + r->cam->getCenter().toString(), 2, olc::RED, dorkestRenderer::LEFT);
+	r->drawTextRow(2, "sLights : " + std::to_string(sceneReg->size<c_staticLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
+	r->drawTextRow(3, "dLights : " + std::to_string(sceneReg->size<c_dynamicLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
+	r->drawTextRow(0, "Mouse (Map) : " + mMap.toString(), 2, Colorf(olc::BLUE), dorkestRenderer::RIGHT);
+	r->drawTextRow(1, "Mouse (Screen) : " + instPGE::getInstance()->GetMousePos().str(),2, olc::BLUE, dorkestRenderer::RIGHT);
+	
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
+	//+	Sort our scene Entities
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
 
 	//Do we need to sort the entities?
 	if (!this->regClean) {
@@ -118,34 +160,38 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 		regClean = true;
 	}
 
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
+	//+	Render the scene map.
+	//-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=-=[+]=
+
 	if (true) {
 		dorkestDataPoint dp("RenderSceneMap");
 		for (int x = 0; x < MAX_MAPSEG_DIMENSION; x++)
 			for (int y = 0; y < MAX_MAPSEG_DIMENSION; y++) {
 				if (map->get(x, y) == nullptr) { continue; }
 				//get the entity registry for the segment.
-				entt::registry* mapreg = map->get(x, y)->entities;
+				std::shared_ptr < entt::registry> mapreg = map->get(x, y)->entReg;
 				//create a view.
 				//TODO : see if we can move this to a pregen variable inside the segment, maybe.
 
-				auto segView = mapreg->view<c_position, c_aabb, c_baseColor, c_sprite, c_imposter, c_statusflags, c_lightSink>();
-				for (auto [entity, pos, bounds, color, spritename, imposter, flags, lightsink] : segView.each()) {
-					//Do we draw the sprite from spritename, or the imposter from imposter?
-					//Prefer the imposter if it has one.
-					if (imposter.imposter != nullptr) {
-						debug("rendering imposter.");
-						r->drawDecal(r->MapToScreen({ 32,32 }, 1, bounds.bBox.getLocation(), { 0,0 }), imposter.decalsize, imposter.imposter, { 0,0 }, imposter.decalsize, color);
-					}
-					else {
-						//debug("lightsink data intensity = " + std::to_string(lightsink.data.intensity));
-						r->setForcedColor(lightsink.data.combinedColor);
-						
-						//r->setForcedColor(p);
-						//r->setForcedColor(blendColor((color.color * lightsink.data.intensity), lightsink.data.combinedColor, 0.9f));
-						r->drawToWorld(bounds.bBox.getLocation().x, bounds.bBox.getLocation().y, bounds.bBox.getLocation().z, spritename, dorkestRenderer::DIFFUSE, true);
-					}
-				}
+				if (mapreg != nullptr && mapreg->alive() != 0) {
+					auto segView = mapreg->view<c_position, c_aabb3, c_baseColor, c_sprite, c_imposter, c_statusflags, c_lightSink>();
+					if (segView.begin() != segView.end())
+						for (auto [entity, pos, bounds, color, spritename, imposter, flags, lightsink] : segView.each()) {
+							//Do we draw the sprite from spritename, or the imposter from imposter?
+							//Prefer the imposter if it has one.
+							if (imposter.imposter != nullptr) {
+								debug("IMPOSTER RENDERING NOT IMPLEMENTED!!!");
+								//r->drawDecal(r->MapToScreen({ 32,32 }, 1, bounds.bBox.getLocation(), { 0,0 }), imposter.decalsize, imposter.imposter, { 0,0 }, imposter.decalsize, color);
+							}
+							else {
 
+								//r->setForcedColor(p);
+								//r->setForcedColor(blendColor((color.color * lightsink.data.intensity), lightsink.data.combinedColor, 0.9f));
+								r->drawSprite(bounds.bBox.getLocation(), spritename, dorkestRenderer::DIFFUSE);
+							}
+						}
+				}
 			}
 
 	}
@@ -158,12 +204,11 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 			//Do we draw the sprite from spritename, or the imposter from imposter?
 			//Prefer the imposter if it has one.
 			if (imposter.imposter != nullptr) {
-				debug("rendering imposter.");
-				r->drawDecal(r->MapToScreen({ 32,32 }, 1, pos.worldPos, { 0,0 }), imposter.decalsize, imposter.imposter, { 0,0 }, imposter.decalsize, color);
+				error("IMPOSTER RENDERING NOT IMPLEMENTED!");
+				//r->drawSprite(imposter., 1, pos.worldPos, { 0,0 }), imposter.decalsize, imposter.imposter, { 0,0 }, imposter.decalsize, color);
 			}
 			else {
-				r->setForcedColor(color);
-				r->drawToWorld(pos.worldPos.x, pos.worldPos.y, pos.worldPos.z, spritename, dorkestRenderer::DIFFUSE, true);
+				r->drawSprite(pos.worldPos, spritename, dorkestRenderer::DIFFUSE, color.color);
 			}
 
 
