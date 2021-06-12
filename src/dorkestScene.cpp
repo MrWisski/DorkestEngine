@@ -67,7 +67,7 @@ dorkestScene::~dorkestScene() {
 	if (this->map != nullptr) map.reset();
 
 	sceneReg->clear();
-	sceneReg.reset();
+	delete sceneReg;
 }
 dorkestBaseEntity* dorkestScene::createNewEntity() {
 
@@ -85,11 +85,19 @@ std::shared_ptr<dorkestBaseEntity> dorkestScene::createTerrain(AABB3f bounds, st
 			assert(this->map != nullptr);
 
 			if (this->map->get(x, y) == nullptr) { error("map seg is null"); continue; }
+
+			//debugss << "Checking " << x << ", " << y << " (" << this->map->get(x, y)->bBox.toString() << ") contains " << bounds.toString();
+
+			//debugss << "map contains bounds : " << (this->map->get(x, y)->bBox.contains(bounds) ? "True" : "False");
+			//debugss << "bounds contains map : " << (bounds.contains(this->map->get(x, y)->bBox) ? "True" : "False");
+
 			if (this->map->get(x, y)->bBox.contains(bounds)) {
 				//We found one!
 
 				regClean = false;
+				assert(map != nullptr);
 				auto seg = this->map->get(x, y);
+				assert(seg != nullptr);
 
 				return seg->createTerrainEntity(bounds,sprite);
 			}
@@ -105,14 +113,12 @@ std::shared_ptr<dorkestBaseEntity> dorkestScene::getEntity(entt::entity ent) {
 
 dorkestScene::dorkestScene(std::string name,Engine* e) {
 	this->name = name;
-	sceneReg = std::make_unique<entt::registry>();
-	this->cam = std::make_shared<dorkestCamera>();
+	sceneReg = new entt::registry();
+	this->cam = std::make_shared<dorkestCamera>(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y);
 	this->r = std::make_shared<dorkestRenderer>(this->cam);
 
 	this->r->setCam(cam);
-	getCamera()->setScreenSize(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y);
-	
-	getCamera()->setOrthogonal(instPGE::getInstance()->GetWindowSize().x, instPGE::getInstance()->GetWindowSize().y, 0, 1);
+
 	
 	
 	map = std::make_unique <dorkestMap>(this);
@@ -136,9 +142,14 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 
 	//Set up our debug HUD stuff.
 	//TODO : Move this somewhere sensible, PLEASE
+
+	//LEFt SIDE
 	r->drawTextRow(0, "Cam Center : " + r->cam->getCenter().toString(), 2, olc::RED, dorkestRenderer::LEFT);
-	r->drawTextRow(2, "sLights : " + std::to_string(sceneReg->size<c_staticLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
-	r->drawTextRow(3, "dLights : " + std::to_string(sceneReg->size<c_dynamicLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
+	r->drawTextRow(1, "Cam zoom : " + std::to_string( r->cam->getZoom()), 2, olc::RED, dorkestRenderer::LEFT);
+	r->drawTextRow(3, "sLights : " + std::to_string(sceneReg->size<c_staticLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
+	r->drawTextRow(4, "dLights : " + std::to_string(sceneReg->size<c_dynamicLight>()),2, olc::YELLOW, dorkestRenderer::LEFT);
+	
+	//Right side
 	r->drawTextRow(0, "Mouse (Map) : " + mMap.toString(), 2, Colorf(olc::BLUE), dorkestRenderer::RIGHT);
 	r->drawTextRow(1, "Mouse (Screen) : " + instPGE::getInstance()->GetMousePos().str(),2, olc::BLUE, dorkestRenderer::RIGHT);
 	
@@ -170,7 +181,41 @@ bool dorkestScene::doFrame(float fElapsedTime) {
 			for (int y = 0; y < MAX_MAPSEG_DIMENSION; y++) {
 				if (map->get(x, y) == nullptr) { continue; }
 				//get the entity registry for the segment.
-				std::shared_ptr < entt::registry> mapreg = map->get(x, y)->entReg;
+				entt::registry* mapreg = map->get(x, y)->entReg;
+				//If this segment is NOT within the view frustrum, we need to skip.
+				this->r->drawAABB3(map->get(x, y)->bBox);
+				AABB3f box = map->get(x, y)->bBox;
+				Vector3f lefte = Vector3f(box.getMax().x, box.getMin().y, 0);
+				Vector3f righte = Vector3f(box.getMin().x, box.getMax().y, 0);
+				Vert vl, vr, vt, vb;
+				vl.pos = lefte; vl.col = olc::RED;
+				vr.pos = righte; vr.col = olc::GREEN;
+				vt.pos = Vector3f(box.getMin().x, box.getMin().y, box.getMax().z); vt.col = olc::BLUE;
+				vb.pos = Vector3f(box.getMax().x, box.getMax().y,0); vb.col = olc::BLACK;
+				r->drawVertex(vl);
+				r->drawVertex(vr);
+				r->drawVertex(vt);
+				r->drawVertex(vb);
+
+
+
+				r->drawTextRow(2, "BB min: " + map->get(x, y)->bBox.getMin().toString(), 2, olc::WHITE, dorkestRenderer::RIGHT);
+				r->drawTextRow(3, "BB max: " + map->get(x, y)->bBox.getMax().toString(), 2, olc::WHITE, dorkestRenderer::RIGHT);
+				Vector2f SBoxm = cam->iTOc({ 32.0f,16.0f }, cam->getZoom(), map->get(x, y)->bBox.getMin(), { 0,0 });
+				Vector2f SBoxM = cam->iTOc({ 32.0f,16.0f }, cam->getZoom(), map->get(x, y)->bBox.getMax(), { 0,0 });
+				r->drawTextRow(4, "BB Xlated min : " + SBoxm.toStr(), 2, olc::WHITE, dorkestRenderer::RIGHT);
+				r->drawTextRow(5, "BB Xlated max : " + SBoxM.toStr(), 2, olc::WHITE, dorkestRenderer::RIGHT);
+
+				if (!cam->canSee(map->get(x, y)->bBox)) {
+					debugss << "FRUSTRUM CULLED SEG AT X : " << x << ", " << y;
+					//debugss << "Mapseg BB : " << map->get(x, y)->bBox.toString();
+					//debugss << "cam BB : " << cam->getBB().toString();
+					
+			
+					
+					continue;
+				}
+
 				//create a view.
 				//TODO : see if we can move this to a pregen variable inside the segment, maybe.
 

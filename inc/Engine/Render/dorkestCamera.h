@@ -49,8 +49,6 @@
 	YOU ARE LOCATED.
 */
 #pragma once
-#include <Util/Math/Vector3.h>
-#include <Util/Math/Matrix3.h>
 #include <Util/Math/Geometry/AABB.h>
 /*
 Camera with settings for 3D viewing
@@ -63,78 +61,55 @@ class dorkestCamera
 {
 private:
 	// camera parameters
-	Vector3f center_;
-	Vector3f lookat_;
-	Vector3f lookup_;
 
-	//bounding
-	AABB3f bb;
-	AABB2f bb2d;
-	// is camera in orthogonal mode and shall fov be used
-	/// true  = orthogonal
-	/// false = perspective
-	bool orthogonal_;
-	bool useFov_;
+	//Where in the world we're looking at.
+	Vector3f m_center;
 
-	// screen size, also used for aspect calculation
-	int sWidth_;
-	int sHeight_;
+	//Screen width/height.
+	int m_sWidth;
+	int m_sHeight;
 
-	// viewport width and height for orthogonal if fov_ not used
-	float vWidth_;
-	float vHeight_;
+	Vector3f m_worldMin;
+	Vector3f m_worldMax;
+	Vector3f m_worldSize;
 
-	// far and near positions
-	float near_;
-	float far_;
-
-	// field of vision in degree for perspective and maybe for orthogonal
-	float fov_;
+	float m_scale;
 
 public:
-	dorkestCamera();
+
+	
+	
+	dorkestCamera(int w, int h);
 	dorkestCamera(const dorkestCamera& src);
 	virtual ~dorkestCamera();
 
+	void setZoom(float zFactor) { m_scale = zFactor; }
+	float getZoom() { return m_scale; }
+	void zoomIn() { m_scale += 0.2f; }
+	void zoomOut() { m_scale -= 0.2f; if (m_scale < 0.01f) m_scale = 0.01f; }
+
+
+
 	Vector2i iTOc(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
+	Vector2f iTOc_f(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
+
 	Vector3f cTOi(Vector2f vTileSize, float scaleFactor, Vector2f screen, Vector2f offset);
 
+	Vector3f cTOi_f(Vector2f vTileSize, float scaleFactor, Vector2f screen, Vector2f offset);
+
 	Vector2i MapToScreen(Vector3f map);
+	Vector2d MapToScreen_f(Vector3f map);
 	Vector3f ScreenToMap(Vector2i screen);
 
-
-
+	bool canSee(AABB3f box);
+	
 	void setScreenSize(int width, int height);
-	void setCameraParameters(float xc, float yc, float zc, float xl, float yl, float zl, float xu = 0.0, float yu = 1.0, float zu = 1.0);
+
 	void setCenter(float x, float y, float z);
-	void setLookat(float x, float y, float z);
-	void setLookUp(float x, float y, float z);
-
-	// sets parameters for orthogonal
-	void setOrthogonal(float width, float height, float near, float far);
-	void setOrthoFov(float fov);
-
-	// sets parameters for perspective
-	void setPerspective(float fov, float near, float far);
-
-	void setPerspectiveMode();
-	void setOrthogonalMode(bool useFov = false);
-
-	// copy all settings from existing camera
-	void copyCameraSettings(const dorkestCamera& camera);
-
+	
 	int getScreenWidth();
 	int getScreenHeight();
 
 	Vector3f getCenter();
 
-	float getMaxDepth();
-	float getNearPlane();
-
-	float getFov();
-
-
-	Matrix3f getLookatMatrix();
-	Matrix3f getProjectionMatrix();
-	Matrix3f getScreenMatrix();
 };

@@ -114,10 +114,16 @@ bool Engine::OnUserCreate()
 	this->scene = new dorkestScene("TEST SCENE", this);
 	//this->scene->setupMap();
 
+
+	//Initialize our ptr to the sprite manager
 	dorkestSpriteMan* dsm = dorkestSpriteMan::getInstance();
+
+	//Add our spritesheet...
 	dsm->addNewSpriteSheet("BasicISO", "./res/ISO/BasicIso.png");
+	//...and make a decal
 	dsm->makeDecal("BasicISO");
 
+	//Start makig some sprites
 	dsm->makeDorkestSprite_Decal("basicCube", olc::WHITE, "BasicISO", 1, { 32,32 }, { 64,0 });
 	dsm->makeDorkestSprite_Decal("wireCube", olc::WHITE, "BasicISO", 1, { 32,32 }, { 0,0 });
 
@@ -331,9 +337,9 @@ void Engine::renderRays() {
 */
 
 void drawPlane(Engine* e) {
-	return;
-	for (int x = 0; x < 16; x++)
-		for (int y = 0; y < 16; y++) {
+	//return;
+	for (int x = 0; x < SEGMENT_DIMENSION; x++)
+		for (int y = 0; y < SEGMENT_DIMENSION; y++) {
 			debug("Creating cube at " + std::to_string(x) + ", " + std::to_string(y));
 			AABB3f tbb(Vector3f(x, y, 0), Vector3f(1, 1, 1));
 			std::shared_ptr<dorkestBaseEntity> entp = e->scene->createTerrain(tbb, "oPlane");
@@ -668,7 +674,7 @@ void Engine::doKeys(float fElapsedTime) {
 		Vector2d cp = olc::vd2d(scene->getCamera()->getCenter());
 		cp += (mpv * 3) * fElapsedTime;
 		//cp.lerp(fElapsedTime,dragpos);
-		debug(cp.toStr());
+		//debug(cp.toStr());
 		scene->setCameraCenter(cp.x, cp.y, 0);
 
 	}
@@ -734,10 +740,10 @@ void Engine::doKeys(float fElapsedTime) {
 
 
 	if (instPGE::getInstance()->GetMouseWheel() < 0) {
-
+		this->scene->getCamera()->zoomIn();
 	}
 	else if (instPGE::getInstance()->GetMouseWheel() > 1) {
-
+		this->scene->getCamera()->zoomOut();
 	}
 
 

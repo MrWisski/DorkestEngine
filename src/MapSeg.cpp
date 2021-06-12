@@ -7,13 +7,28 @@ MapSeg::MapSeg(AABB3f bounds, dorkestScene* parent)
 {
 	this->bBox = bounds;
 	this->owner = parent;
-	this->entReg = std::shared_ptr < entt::registry>();
-
+	this->entReg = new entt::registry();
+	debug("Creating ground plane for segment at " + bounds.toString());
+	this->drawPlane(Colorf(1, 0, 0, 1));
 }
 
 
 MapSeg::~MapSeg()
 {
+	if (entReg != nullptr) {
+		delete entReg;
+	} else {
+		error("Deconstructing MapSeg, but the registry is already a nullptr!!");
+	}
+
+	if (this->ptrStore.empty() != false) {
+		for (auto kv : this->ptrStore) {
+			//Dec the pointer count..hopefully to zero.
+			kv.second.reset();
+			this->ptrStore.erase(kv.first);
+		}
+		this->ptrStore.clear();
+	}
 }
 
 void MapSeg::loadPrefab(std::string path)
@@ -32,8 +47,9 @@ std::shared_ptr<dorkestBaseEntity> MapSeg::createEntity()
 std::shared_ptr<dorkestBaseEntity> MapSeg::createTerrainEntity(AABB3f bounds, std::string sprite)
 {
 	Vector2i screenLoc = this->owner->getCamera()->MapToScreen(bounds.getLocation());
+	TerrainEntity te(this->entReg, bounds, screenLoc, sprite);
 
-	return std::make_shared<dorkestBaseEntity>((dorkestBaseEntity)TerrainEntity(this->entReg,bounds,screenLoc,sprite));
+	return std::make_shared<dorkestBaseEntity>(te);
 	
 }
 
@@ -161,21 +177,24 @@ void MapSeg::sort()
 		});
 }
 
-void MapSeg::drawPlane() {
+void MapSeg::drawPlane(Colorf c) {
 	return;
-	for (int x = 0; x < 16; x++)
-		for (int y = 0; y < 16; y++) {
+	for (int x = 0; x < SEGMENT_DIMENSION; x++)
+		for (int y = 0; y < SEGMENT_DIMENSION; y++) {
 			Vector3f poss = this->bBox.getLocation() + Vector3f(x, y, 0);
-			debug("Creating cube at " + std::to_string(poss.x) + ", " + std::to_string(poss.y));
+			debug("Creating plane at " + std::to_string(poss.x) + ", " + std::to_string(poss.y));
 			AABB3f tbb(poss, Vector3f(1, 1, 1));
 			std::shared_ptr<dorkestBaseEntity> entp = this->createTerrainEntity(tbb, "oPlane");
 
 			c_baseColor cb = entp->getComponent<c_baseColor>();
-			cb.color = olc::WHITE;
+			cb.color = c;
 			entp->updateComponent<c_baseColor>(cb);
 
 			if (entp == nullptr) { error("DBE is null!"); }
 			
+			//save it to the ptrstore
+			this->ptrStore.emplace(entp->getHandle(), entp);
+
 
 		}
 	debug("DONE!");

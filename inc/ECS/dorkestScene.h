@@ -12,9 +12,9 @@ class dorkestMap;
 class MapSeg;
 
 //The size that a mapseg initializes to (16x16x16)
-const int SEGMENT_DIMENSION = 16;
+const int SEGMENT_DIMENSION = 8;
 //The max size mapseg map dimension (8x8)
-const int MAX_MAPSEG_DIMENSION = 8;
+const int MAX_MAPSEG_DIMENSION = 1;
 
 //an 8x8 of 16x16x16 yields 4,000 meters per side.
 
@@ -72,7 +72,7 @@ public:
 
 	~dorkestScene();
 private:
-	std::shared_ptr<entt::registry> sceneReg;
+	entt::registry* sceneReg;
 	std::string name = "INVALID";
 	bool regClean = false;
 	std::shared_ptr <dorkestCamera> cam = nullptr;

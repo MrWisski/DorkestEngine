@@ -237,6 +237,8 @@ bool dorkestRenderer::drawToScreen(Vector2i screenPos, std::string name, sType s
 	//Get the offset for what sprite we're drawing.
 	Vector2f coord = Vector2f(spr->getSpriteCoord().x, spriteType );
 
+	scale = cam->getZoom();
+
 	//Draw the sprite from the center.
 	screenPos.x -= (size.x/2) * scale;
 	screenPos.y -= (size.y/2) * scale;
@@ -286,6 +288,55 @@ void dorkestRenderer::drawAABB3(AABB3f box, Colorf col)
 	v[6] = Vector3f(m.x, m.y - sy, m.z);
 	v[7] = Vector3f(m.x - sx, m.y - sy, m.z);
 
+	//Bottom face
+	//this->drawLine3D(LineSeg3Df(v[0], v[1]), col);
+	this->drawLine3D(LineSeg3Df(v[1], v[3]), col);
+	this->drawLine3D(LineSeg3Df(v[3], v[2]), col);
+	//this->drawLine3D(LineSeg3Df(v[2], v[0]), col);
+
+	//Top Face
+	this->drawLine3D(LineSeg3Df(v[4], v[5]), col);
+	this->drawLine3D(LineSeg3Df(v[5], v[7]), col);
+	this->drawLine3D(LineSeg3Df(v[7], v[6]), col);
+	this->drawLine3D(LineSeg3Df(v[6], v[4]), col);
+
+	//Connecting lines
+	this->drawLine3D(LineSeg3Df(v[1], v[6]), col);
+	this->drawLine3D(LineSeg3Df(v[3], v[4]), col);
+	this->drawLine3D(LineSeg3Df(v[2], v[5]), col);
+
+
+	//this->drawLine3D(LineSeg3Df(v[1], v[2]), col);
+	//this->drawLine3D(LineSeg3Df(v[2], v[3]), col);
+	//this->drawLine3D(LineSeg3Df(v[3], v[4]), col);
+	//this->drawLine3D(LineSeg3Df(v[4], v[5]), col);
+	//this->drawLine3D(LineSeg3Df(v[5], v[6]), col);
+	//this->drawLine3D(LineSeg3Df(v[6], v[7]), col);
+	//this->drawLine3D(LineSeg3Df(v[7], v[0]), col);
+}
+
+void dorkestRenderer::drawAABB2(AABB2i box, Colorf col)
+{
+	Vector2f v[4];
+	Vector2f l = box.getLocation();
+	Vector2f m = box.getMax();
+
+	float sx = box.getHalfsize().x * 2;
+	float sy = box.getHalfsize().y * 2;
+	//float sz = box.getHalfsize().z * 2;
+
+	v[0] = Vector2f(l.x, l.y);
+	v[1] = Vector2f(l.x + sx, l.y);
+	v[2] = Vector2f(l.x, l.y + sy);
+	v[3] = Vector2f(l.x + sx, l.y + sy);
+
+
+
+	//Bottom face
+	this->drawLine2D(LineSeg2Di(v[0], v[1]), col);
+	this->drawLine2D(LineSeg2Di(v[1], v[3]), col);
+	this->drawLine2D(LineSeg2Di(v[3], v[2]), col);
+	this->drawLine2D(LineSeg2Di(v[2], v[0]), col);
 
 }
 

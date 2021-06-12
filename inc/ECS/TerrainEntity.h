@@ -4,7 +4,7 @@
 class TerrainEntity : public dorkestBaseEntity {
 public:
 
-	TerrainEntity(std::shared_ptr<entt::registry> reg, AABB3f bounds, Vector2i screenLoc, std::string sprite = "oCube") : dorkestBaseEntity(reg) {
+	TerrainEntity(entt::registry* reg, AABB3f bounds, Vector2i screenLoc, std::string sprite = "oCube") : dorkestBaseEntity(reg) {
 		assert(reg != nullptr);
 
 		this->addComponent<c_aabb3>(bounds);

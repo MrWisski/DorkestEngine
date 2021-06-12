@@ -70,7 +70,7 @@ public:
 	/// </summary>
 	void sort();
 
-	void drawPlane();
+	void drawPlane(Colorf c = Colorf(1,1,1,1));
 
 	/// <summary>
 	/// Check if this mapseg is empty.
@@ -83,7 +83,7 @@ public:
 protected:
 	AABB3f bBox;
 
-	std::shared_ptr < entt::registry> entReg;
-
+	entt::registry* entReg;
+	std::map<entt::entity, std::shared_ptr<dorkestBaseEntity>> ptrStore;
 	dorkestScene* owner;
 };

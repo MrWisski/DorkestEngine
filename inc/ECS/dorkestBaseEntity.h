@@ -5,13 +5,13 @@
 class dorkestBaseEntity {
 public:
 
-	dorkestBaseEntity(std::shared_ptr < entt::registry> reg) : m_reg(reg.get()), m_handle(entt::null) {
+	dorkestBaseEntity(entt::registry* reg) : m_reg(reg), m_handle(entt::null) {
 		if (m_reg == nullptr) {	error("Null pointer to registry passed to entity constructor!"); return;}
 		m_handle = m_reg->create();
 
 	}
 
-	dorkestBaseEntity(std::shared_ptr<entt::registry> reg, entt::entity ent) : m_reg(reg.get()), m_handle(ent) {
+	dorkestBaseEntity(entt::registry* reg, entt::entity ent) : m_reg(reg), m_handle(ent) {
 		if (m_reg == nullptr) { error("Null pointer to registry passed to entity constructor!"); return; }
 		if (m_handle == entt::null) { error("Null pointer to an entity passed to entity constructor!"); return; }
 	}

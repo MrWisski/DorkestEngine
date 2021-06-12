@@ -80,6 +80,8 @@ public:
 	dorkestRenderer(std::shared_ptr<dorkestCamera> useCamera) : cam(useCamera) {};
 	void setCam(std::shared_ptr<dorkestCamera> useCamera) { this->cam = useCamera; }
 
+
+
 	~dorkestRenderer() = default;
 
 	/// <summary>
