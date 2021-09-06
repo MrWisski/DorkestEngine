@@ -1,5 +1,4 @@
 #pragma once
-#include "instPGE.h"
 #include <entt/entity/registry.hpp>
 #include "dorkestBaseEntity.h"
 #include <Engine/Render/dorkestCamera.h>
@@ -12,20 +11,20 @@ class dorkestMap;
 class MapSeg;
 
 //The size that a mapseg initializes to (16x16x16)
-const int SEGMENT_DIMENSION = 8;
+const int SEGMENT_DIMENSION = 16;
 //The max size mapseg map dimension (8x8)
-const int MAX_MAPSEG_DIMENSION = 1;
+const int MAX_MAPSEG_DIMENSION = 8;
 
 //an 8x8 of 16x16x16 yields 4,000 meters per side.
 
 
 class dorkestScene {
 public:
-	dorkestScene(std::string name, Engine* e);
+	dorkestScene(std::string name);
 
-	std::shared_ptr < dorkestRenderer> getRenderer();
+	dorkestRenderer* getRenderer();
 	void setCameraCenter(float x, float y, float z);
-	std::shared_ptr <dorkestCamera> getCamera();
+	dorkestCamera* getCamera();
 
 	/// <summary>
 	/// Forces the scene to recalculate lighting.
@@ -50,14 +49,14 @@ public:
 	/// </summary>
 	/// <param name="bounds">The bounding box of the terrain (Restricted to 1x1x1 max!)</param>
 	/// <returns>A TerrainEntity wrapper if successful, nullptr if not.</returns>
-	std::shared_ptr<dorkestBaseEntity> createTerrain(AABB3f bounds, std::string sprite = "oCube");
+	dorkestBaseEntity* createTerrain(AABB3f bounds, std::string sprite = "oCube");
 
 	/// <summary>
 	/// retrieves a dorkestBaseEntity from the registry.
 	/// </summary>
 	/// <param name="ent">the entt handle to an entity.</param>
 	/// <returns>the equavalent dorkestBaseEntity pointer.</returns>
-	std::shared_ptr<dorkestBaseEntity> getEntity(entt::entity ent);
+	dorkestBaseEntity getEntity(entt::entity ent);
 
 	/// <summary>
 	/// Lets the scene know ENTT registry was mucked with, and needs to be updated.
@@ -75,9 +74,9 @@ private:
 	entt::registry* sceneReg;
 	std::string name = "INVALID";
 	bool regClean = false;
-	std::shared_ptr <dorkestCamera> cam = nullptr;
-	std::shared_ptr <dorkestRenderer> r = nullptr;
+	dorkestCamera* cam = nullptr;
+	dorkestRenderer* r = nullptr;
 
-	std::shared_ptr < dorkestMap> map = nullptr;
+	dorkestMap* map = nullptr;
 	//std::vector<MapSeg*> map;
 };

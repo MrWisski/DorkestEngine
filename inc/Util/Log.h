@@ -54,9 +54,9 @@
 #include <vector>
 #include <string>
 #include <map>
-
-#include <Engine/imguiWindows/ConsoleIMGUI.h>
-
+#include <functional>
+#include <ostream>
+#include <sstream>
 
 //Make some global defines to make logging simple and painless.
 #define error(msg) Log::Instance()->_error(msg, __FUNCTION__);
@@ -71,11 +71,11 @@
 class Log
 {
 public:
-    using Stream = std::ostringstream;
-    using Buffer_p = std::unique_ptr<Stream, std::function<void(Stream*)>>;
+    
+    using Buffer_p = std::unique_ptr<std::ostringstream, std::function<void(std::ostringstream*)>>;
 
     Buffer_p d_stream() {
-        return Buffer_p(new Stream, [&](Stream* st) {
+        return Buffer_p(new std::ostringstream, [&](std::ostringstream* st) {
             *st << std::endl;
             if (Log::Instance()->debugflags.end() == Log::Instance()->debugflags.find("[DEBUG STREAM]")) Log::Instance()->debugflags["[DEBUG STREAM]"] = true;
             logStream(DEBUG, st->str());
@@ -83,21 +83,20 @@ public:
     }
 
     Buffer_p i_stream() {
-        return Buffer_p(new Stream, [&](Stream* st) {
+        return Buffer_p(new std::ostringstream, [&](std::ostringstream* st) {
             if (Log::Instance()->infoflags.end() == Log::Instance()->infoflags.find("[INFO STREAM]")) Log::Instance()->infoflags["[INFO STREAM]"] = true;
             logStream(INFO, st->str());
             });
     }
 
     Buffer_p e_stream() {
-        return Buffer_p(new Stream, [&](Stream* st) {
+        return Buffer_p(new std::ostringstream, [&](std::ostringstream* st) {
 
             if (Log::Instance()->errorflags.end() == Log::Instance()->errorflags.find("[ERROR STREAM]")) Log::Instance()->errorflags["[ERROR STREAM]"] = true;
             logStream(ERR, st->str());
             });
     }
 
-    AppConsole* imguiconsole;
 
     enum log_type
     {
@@ -153,12 +152,6 @@ public:
         fName = filename;
     }
 
-    void render();
-    void show();
-    void hide();
-    void toggleShowHide();
-    bool* open;
-
 private:
     bool vis = false;
     std::string dir;
@@ -183,12 +176,12 @@ private:
     std::map<std::string, bool > debugflags;
 
     Log() {
-        imguiconsole = new AppConsole();
-        open = new bool(false);
+        
+       
     }
     ~Log() {
-        delete imguiconsole;
-        delete open;
+        
+     
     }
 
 };

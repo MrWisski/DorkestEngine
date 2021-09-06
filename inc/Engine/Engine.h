@@ -50,66 +50,52 @@
 */
 
 #pragma once
-#include "olcPixelGameEngine.h"
-
-#include "Extensions\olcPGEX_SplashScreen.h"
-#include "Extensions\olcPGEX_Camera2D.h"
-//The OLC Sound Extension
-#include "Extensions\olcPGEX_Sound.h"
-//The OLC AudioConversion Extension
-#include "Extensions\olcPGEX_AudioConverter.h"
 
 #include "Util/Math/Vector3.h"
 #include "Util/Math/Vector2.h"
 #include "Util/Math/Geometry/Ray.h"
-#include <Util/Math/Geometry/FibSphere.h>
 
-#include "imguiWindows/ConsoleIMGUI.h"
-#include "imguiWindows/DebugIMGUI.h"
 #include <vector>
+#include <SFML/Graphics.hpp>
+#include <Engine/inputManager.h>
 
 class dorkestRenderer;
 class Block;
 class dorkestBaseEntity;
 class dorkestScene;
+class dorkestCamera;
+class instPGE;
+class dorkestSpriteMan;
+class dorkestSpriteSheet;
 
 class Engine 
 {
 public:
-	dorkestScene* scene;
-	DebugStuff* toolwin;
-	std::vector<std::shared_ptr<dorkestBaseEntity>> ents;
-	olcPGEX_SplashScreen* splashScreen;
-	olc::SOUND::AudioSample* as;
-	FibSphere* fsphere;
-
-	std::map<olc::vi2d, olc::Pixel> pMap;
-	AppConsole console;
-
-	int m_sample;
-
 	
+	dorkestSpriteMan* dsm = nullptr;
+	inputMan* im = nullptr;
 
-	bool skipSplash = false;
-	bool toggleWireFrame = false;
-	bool toggleNormal = false;
-	bool toggleSprite = true;
+	dorkestRenderer* m_renderer = nullptr;
+	dorkestCamera* m_camera = nullptr;
+	sf::RenderWindow* m_window = nullptr;
+	sf::Font* m_useFont = nullptr;
+	sf::Clock m_dt;
 
-	int count;
-	bool toggle;
-	olc::Pixel cellcolor;
-	Vector2i vMouse;
-	Vector3f vMouseMap;
-
-	int moveposx = 0;
-	int moveposy = 0;
 
 
 	bool pressAnyKey();
-	bool OnUserCreate();
-	
-	void doKeys(float fElapsedTime);
+	bool initWindow();
+	bool initSound();
+	bool initEngine();
+	bool update(float fElapsedTime);
+	bool destroy();
 
-	bool OnUserUpdate(float fElapsedTime);
-	bool OnUserDestroy();
+	void handleWinEvent(windowEvent* e);
+	void handleKeyEvent(keyEvent* e);
+	void handleMouseEvent(mouseEvent* e);
+
+	Engine() {}
+	~Engine() { destroy(); }
+
+	Vector2i pos;
 };

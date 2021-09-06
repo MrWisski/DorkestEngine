@@ -97,32 +97,6 @@ void Log::_debug(std::string msg, std::string caller)
     Log::Instance()->log(DEBUG, caller, msg);
 }
 
-void Log::render()
-{
-
-    if (this->vis) {
-        *open = true;
-        this->imguiconsole->Draw("dorkestEngine Debug Console", open);
-        if (*open == false) {
-            this->vis = false;
-        }
-    }
-}
-
-void Log::show()
-{
-    this->vis = true;
-}
-
-void Log::hide()
-{
-    this->vis = false;
-}
-
-void Log::toggleShowHide()
-{
-    this->vis = !this->vis;
-}
 
 void Log::log(log_type p_type, std::string caller,std::string p_msg)
 {
@@ -205,7 +179,7 @@ void Log::log(log_type p_type, std::string caller,std::string p_msg)
         std::cout << msg << std::endl;
     }
     m_messages.push_back(timestr+msg);
-    imguiconsole->AddLog(msg.c_str());
+  
 }
 
 void Log::logStream(log_type p_type, std::string p_msg)
@@ -275,7 +249,7 @@ void Log::logStream(log_type p_type, std::string p_msg)
         std::cout << msg ;
     }
     m_messages.push_back(timestr + msg);
-    imguiconsole->AddLog(msg.c_str());
+
 }
 
 void Log::save()

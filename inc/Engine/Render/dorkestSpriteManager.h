@@ -54,6 +54,9 @@
 #include <Util/Log.h>
 
 #include "dorkestSprite.h"
+#include "dorkestSpriteSheet.h"
+#include <Util/Math/Vector2.h>
+#include <Util/Color.h>
 
 
 class dorkestSpriteMan {
@@ -66,21 +69,89 @@ public:
 		return dorkestSpriteMan::instance;
 	}
 
-	bool addNewSpriteSheet(std::string name, std::string path) {
+
+	/// <summary>
+	/// Loads a spritesheet from disk in JSON format.
+	/// </summary>
+	/// <param name="path">Path to the file</param>
+	/// <param name="filename">Name of file to load.</param>
+	/// <returns>The name of the sheet to use for access.</returns>
+	std::string loadSpriteSheet(std::string path, std::string filename) {
+		debug("Loading SS from .json");
+		dorkestSpriteSheet* newsheet = new dorkestSpriteSheet(path + "/", filename);
+		auto itr = m_spriteSheets.find(newsheet->getName());
+		if (itr != m_spriteSheets.end()) {
+			error("Sprite sheet named " + newsheet->getName() + " already exists. If you wish to replace, use replaceSpriteSheet()");
+			return "";
+		}
+		debug("Adding sprite sheet " + newsheet->getName() + " to SS index.");
+		this->m_spriteSheets.emplace(newsheet->getName(), newsheet);
+		newsheet->registerSprites();
+		return newsheet->getName();
+	}
+
+	/// <summary>
+	/// Loads a spritesheet from disk in JSON format, replacing any existing copy in the index.
+	/// </summary>
+	/// <param name="path">Path to the file</param>
+	/// <param name="filename">Name of file to load.</param>
+	/// <returns>The name of the sheet to use for access.</returns>
+	std::string replaceSpriteSheet(std::string path, std::string filename) {
+		debug("Loading SS from .json");
+		dorkestSpriteSheet* newsheet = new dorkestSpriteSheet(path + "\\", filename);
+		if (newsheet == nullptr || newsheet->getName() == "") {
+			error("Invalid sheet - new returned null, or name is blank.");
+			return "";
+		}
+		auto itr = m_spriteSheets.find(newsheet->getName());
+		bool replace = false;
+		if (itr != m_spriteSheets.end()) {
+			debug("Replacing existing copy.");
+			replace = true;
+		}
+
+		if (replace) {
+			m_spriteSheets.insert_or_assign(newsheet->getName(), newsheet);
+		} else {
+			this->m_spriteSheets.emplace(newsheet->getName(), newsheet);
+		}
+		
+		newsheet->registerSprites();
+		return newsheet->getName();
+	}
+
+
+	dorkestSpriteSheet* getSheet(std::string name) {
+		auto itr = m_spriteSheets.find(name);
+		if (itr == m_spriteSheets.end()) {
+			error("Sprite sheet named " + name + " was not found.");
+			return nullptr;
+		}
+		return itr->second;
+
+	}
+
+	bool addNewSpriteSheet(std::string name, std::string path, int spritex, int spritey, int padding) {
 		/*	it = mymap.find('b');
 			if (it != mymap.end())
 				mymap.erase (it);*/
-
+		debug("dsm->addnewSS");
 		auto itr = m_spriteSheets.find(name);
 		if (itr != m_spriteSheets.end()) {
 			error("Cannot add a spritesheet with the name of " + name + " -- Spritesheet with that name already exists!");
 			return false;
 		}
-		
-		olc::Sprite* newSheet;
-		newSheet = new olc::Sprite(path);
 
-		if (newSheet == nullptr || newSheet == 0) {
+		dorkestSpriteSheet* newSheet;
+		newSheet = new dorkestSpriteSheet(name);
+		debug("Source image path = " + path);
+		newSheet->setSourceSpriteSize(spritex, spritey);
+		newSheet->setSourceCellPadding(padding);
+		newSheet->setSourceImage(path);
+		
+		
+
+		if (newSheet == nullptr) {
 			error("Could not load sprite from file!");
 			return false;
 		}
@@ -92,50 +163,17 @@ public:
 		if (itr != m_spriteSheets.end()) {
 			debug("Spritesheet added successfully.");
 			return true;
-		} else {
-			error("Failed to add spritesheet with name " + name + " to the spritesheets map!");
-			delete(newSheet);
-			return false;
-		}
-	}
-
-	bool makeDecal(std::string spriteSourceName) {
-		auto itr = m_spriteSheets.find(spriteSourceName);
-		if (itr == m_spriteSheets.end()) {
-			error("Cannot add a decalsheet with the name of " + spriteSourceName + " -- Spritesheet with that name does not exist! Add it first and try again!");
-			return false;
-		}
-		std::string name = itr->first;
-		if (itr->second == nullptr || itr->second == 0) {
-			error("CRITICAL ERROR - iterator returned pointer of 0/null");
-			return false;
-		}
-		olc::Decal* newSheet = new olc::Decal(itr->second);
-
-		if (newSheet != nullptr && newSheet != 0) {
-			m_decalSheets.emplace(name, newSheet);
-		} else {
-			error("Failed to create new decal from spritesheet " + name + "!");
-			delete newSheet;
-			return false;
-		}
-
-		
-		//confirm it's actually in the map!
-		auto itrD = m_decalSheets.find(name);
-
-		if (itrD != m_decalSheets.end()) {
-			debug("New Decalsheet created successfully.");
-			return true;
 		}
 		else {
 			error("Failed to add spritesheet with name " + name + " to the spritesheets map!");
 			delete(newSheet);
 			return false;
-		}		
+		}
 	}
 
-	bool makeDorkestSprite_Decal(std::string dorkestSpriteName, olc::Pixel tint, std::string decalSheetName, float scale, olc::vi2d size, olc::vi2d spriteSrcCoord) {
+
+
+	bool makeNewDorkestSprite(std::string SheetName, std::string dorkestSpriteName, Colorf tint, float scale, Vector2d size, Vector2d spriteSrcCoord, std::string groupName) {
 		auto itr = m_dSprites.find(dorkestSpriteName);
 		if (itr != m_dSprites.end()) {
 			error("Cannot add a decalsheet with the name of " + dorkestSpriteName + " -- dorkestSprite with that name already exists!");
@@ -143,25 +181,26 @@ public:
 		}
 
 
-		auto itrdecal = m_decalSheets.find(decalSheetName);
-		if (itrdecal == m_decalSheets.end()) {
-			error("Cannot create the dSprite " + dorkestSpriteName + " -- cannot find decal sheet " + decalSheetName + "! Create it first with dorkestSpriteMan::getInstance()->makeDecal(" + decalSheetName + ")!");
+		auto itrdecal = m_spriteSheets.find(SheetName);
+		if (itrdecal == m_spriteSheets.end()) {
+			error("Cannot create the dSprite " + dorkestSpriteName + " -- cannot find sprite sheet " + SheetName + "!");
 			return false;
 		}
 
-		dorkestSprite* newSprite = new dorkestSprite(dorkestSpriteName,itrdecal->second);
+		dorkestSprite* newSprite = new dorkestSprite(dorkestSpriteName, itrdecal->second->getName());
 		newSprite->setSpriteCoord(spriteSrcCoord);
 		newSprite->setScaleFactor(scale);
 		newSprite->setSpriteTint(tint);
 		newSprite->setSpriteSize(size);
-
+		newSprite->setAltGroup(groupName);
+	
 		m_dSprites.emplace(dorkestSpriteName, newSprite);
-		
+
 		//confirm it's actually in the map!
 		auto itrD = m_dSprites.find(dorkestSpriteName);
 
 		if (itrD != m_dSprites.end()) {
-			debug("Created dorkestSprite " + dorkestSpriteName+ ".");
+			debug("Created dorkestSprite " + dorkestSpriteName + ".");
 			return true;
 		}
 		else {
@@ -195,20 +234,14 @@ private:
 		}
 		m_spriteSheets.clear();
 
-		for (auto p : m_decalSheets) {
-			delete(p.second);
-		}
-		m_decalSheets.clear();
-
 		dorkestSpriteMan::instance = 0;
 
 	}
 
 	std::map<std::string, dorkestSprite*> m_dSprites;
-	std::map<std::string, olc::Sprite*> m_spriteSheets;
-	std::map<std::string, olc::Decal*> m_decalSheets;
+	std::map<std::string, dorkestSpriteSheet*> m_spriteSheets;
 
-	
+
 
 
 };

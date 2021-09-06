@@ -410,8 +410,8 @@ public:
 
 	Vector4<T> floor() const { return Vector4<T>(std::floor(x), std::floor(y), std::floor(z), std::floor(w)); }
 	Vector4<T> ceil() const { return Vector4<T>(std::ceil(x), std::ceil(y), std::ceil(z), std::ceil(w)); }
-	Vector4<T> max(const Vector4<T>& v) const { return Vector4<T>(std::max(x, v.x), std::max(y, v.y), std::max(z, v.z), std::max(w, v.w)); }
-	Vector4<T> min(const Vector4<T>& v) const { return Vector4<T>(std::min(x, v.x), std::min(y, v.y), std::min(z, v.z), std::min(w, v.w)); }
+	Vector4<T> maxv(const Vector4<T>& v) const { return Vector4<T>(std::max<T>(x, v.x), std::max<T>(y, v.y), std::max<T>(z, v.z), std::max<T>(w, v.w)); }
+	Vector4<T> minv(const Vector4<T>& v) const { return Vector4<T>(std::min<T>(x, v.x), std::min<T>(y, v.y), std::min<T>(z, v.z), std::min<T>(w, v.w)); }
 
 
 	//-------------[ conversion ]-----------------------------

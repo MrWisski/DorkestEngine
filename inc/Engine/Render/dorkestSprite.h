@@ -49,66 +49,57 @@
 	YOU ARE LOCATED.
 */
 #pragma once
-
-#include <olcPixelGameEngine.h>
-#include <instPGE.h>
-
-
-
+#include <Util/Math/Vector2.h>
+#include <SFML/Graphics.hpp>
 
 class dorkestSprite {
 public:
 
 	dorkestSprite() {}
 
-	dorkestSprite(std::string Name, olc::Sprite* spriteSheet) : m_name(Name), m_sourcesheet(spriteSheet) {}
-	dorkestSprite(std::string Name, olc::Decal* decalSheet) {
-		m_name = Name;
-		m_decalsheet = decalSheet;
+	dorkestSprite(std::string Name,std::string spriteSheet) : m_name(Name), m_sourcesheet(spriteSheet) {
+		
+	
 	}
 
 	dorkestSprite(dorkestSprite& other) {
 		m_name = other.m_name;
 		m_sourcesheet = other.m_sourcesheet;
-		m_decalsheet = other.m_decalsheet;
 		m_spriteCoord = other.m_spriteCoord;
 		m_spriteSize = other.m_spriteSize;
 		m_color = other.m_color;
 	}
 
-	void setSpriteSize(olc::vi2d s) { m_spriteSize = s; }
-	olc::vi2d getSpriteSize() { return m_spriteSize; }
+	void setSpriteSize(Vector2d s) { m_spriteSize = s; }
+	Vector2d getSpriteSize() { return m_spriteSize; }
 
-	void setSpriteCoord(olc::vi2d coord) { m_spriteCoord = coord; }
-	olc::vi2d getSpriteCoord() { return m_spriteCoord; }
+	void setSpriteCoord(Vector2d coord) { m_spriteCoord = coord; }
+	Vector2i getSpriteCoord() { return m_spriteCoord; }
 
 	void setScaleFactor(float scale) { m_scaleFactor = scale; }
 	float getScaleFactor() { return m_scaleFactor; }
 
-	void setSpriteTint(olc::Pixel tint) { m_color = tint; }
-	olc::Pixel getSpriteTint() { return m_color; }
+	void setSpriteTint(Colorf tint) { m_color = tint; }
+	Colorf getSpriteTint() { return m_color; }
 
-	bool hasDecal() { return (m_decalsheet != nullptr); }
-	olc::Decal* getDecalSheet() { return m_decalsheet; }
+	void setAltGroup(std::string groupName) { m_altGroup = groupName; }
+	std::string getAltGroup() { return m_altGroup; }
 
-	bool hasSprite() { return (m_sourcesheet != nullptr); }
-	olc::Sprite* getSpriteSheet() { return m_sourcesheet; }
+	void set3x3GroupName(std::string groupName) { m_3x3GroupName = groupName; }
+	std::string get3x3GroupName() { return m_3x3GroupName; }
+
+	void setIs3x3(bool newval) { m_is3x3 = newval; }
+	bool getIs3x3() { return m_is3x3; }
+
+	bool hasSprite() { return (m_sourcesheet != ""); }
+	std::string getSpriteSheet() { return m_sourcesheet; }
 
 	std::string toStr() {
 		std::string ret = "SPRITE CONTENTS : \n";
 		ret += "Name : " + m_name + "\n";
 		ret += "Scale Factor: " + std::to_string(m_scaleFactor) + "\n";
 		
-		if ((this->m_decalsheet == nullptr)) {
-			ret += "Decal Sheet null : Yes\n";
-
-		}
-		else {
-			ret += "Decal Sheet null : No\n";
-
-		}
-		
-		if ((this->m_sourcesheet == nullptr)) {
+		if ((this->m_sourcesheet == "")) {
 			ret += "Sprite Sheet null : Yes\n";
 
 		}
@@ -117,21 +108,33 @@ public:
 
 		}
 
-		ret += "Sprite Coord : " + m_spriteCoord.str() + "\n";
-		ret += "Sprite Size : " + m_spriteSize.str() + "\n";
+		ret += "Sprite Coord : " + m_spriteCoord.toStr() + "\n";
+		ret += "Sprite Size : " + m_spriteSize.toStr() + "\n";
 		
 		return ret;
 
 	}
 
+	sf::Sprite* getSprite();
+
+	~dorkestSprite() {
+		if (m_spriteData != nullptr) {
+			delete m_spriteData;
+		}
+	}
 private:
 	std::string m_name = "";
 	float m_scaleFactor = 1.0f;
-	olc::Sprite* m_sourcesheet = nullptr;
-	olc::Decal* m_decalsheet = nullptr;
+	std::string m_sourcesheet = "";
+	
+	sf::Sprite* m_spriteData = nullptr;
 
-	olc::vi2d m_spriteCoord = {0, 0 };
-	olc::vi2d m_spriteSize = { 0, 0 };
-	olc::Pixel m_color = olc::WHITE;
+	Vector2i m_spriteCoord = {0, 0 };
+	Vector2i m_spriteSize = { 0, 0 };
+	Colorf m_color = Colorf(1,1,1,1);
 
+	std::string m_altGroup = "";
+
+	std::string m_3x3GroupName = "";
+	bool m_is3x3 = false;
 };

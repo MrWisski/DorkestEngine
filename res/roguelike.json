@@ -1,0 +1,73 @@
+{
+    "sheetSavePath": "C:\\Coding\\CPP\\DarkestEngine\\res\\roguelike.json",
+    "sourceCellPadding": 1,
+    "sourceHeight": 526,
+    "sourceName": "roguelikeSheet_transparent",
+    "sourcePath": "C:\\Coding\\CPP\\DarkestEngine\\res\\roguelike\\roguelikeSheet_transparent.png",
+    "sourceWidth": 968,
+    "spriteCount": 6,
+    "spriteData": {
+        "dirt0": {
+            "spriteAltGroup": "dirt",
+            "spriteCellX": 102,
+            "spriteCellY": 0,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        },
+        "dirt1": {
+            "spriteAltGroup": "dirt",
+            "spriteCellX": 102,
+            "spriteCellY": 17,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        },
+        "grass0": {
+            "spriteAltGroup": "grass",
+            "spriteCellX": 85,
+            "spriteCellY": 0,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        },
+        "grass1": {
+            "spriteAltGroup": "grass",
+            "spriteCellX": 85,
+            "spriteCellY": 17,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        },
+        "water0": {
+            "spriteAltGroup": "water",
+            "spriteCellX": 0,
+            "spriteCellY": 0,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        },
+        "water1": {
+            "spriteAltGroup": "water",
+            "spriteCellX": 17,
+            "spriteCellY": 0,
+            "spriteScale": 1.0,
+            "spriteTintA": 1,
+            "spriteTintB": 1,
+            "spriteTintG": 1,
+            "spriteTintR": 1
+        }
+    },
+    "spriteSizeH": 16,
+    "spriteSizeW": 16
+}

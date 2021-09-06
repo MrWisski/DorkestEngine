@@ -10,7 +10,7 @@
 #include <string>
 #include <cassert>
 #include <cstdio>
-#include <olcPixelGameEngine.h>
+
 
 #include "Vector3.h"
 
@@ -40,33 +40,7 @@ template<class T>
 class Vector2
 {
 public:
-	union
-	{
-		/**
-		 * First element of vector, alias for X-coordinate.
-		 */
-		T x;
-
-		/**
-		 * First element of vector, alias for S-coordinate.
-		 * For textures notation.
-		 */
-		T s;
-	};
-
-	union
-	{
-		/**
-		 * Second element of vector, alias for Y-coordinate.
-		 */
-		T y;
-
-		/**
-		 * Second element of vector, alias for T-coordinate.
-		 * For textures notation.
-		 */
-		T t;
-	};
+	T x, y;
 
 	//----------------[ constructors ]--------------------------
 	/**
@@ -88,20 +62,11 @@ public:
 	}
 
 	/**
-	 * Creates and sets to an olc::vi2d
+	 * Creates and sets to an Vector2d
 	 */
-	Vector2(olc::vi2d n) : x(static_cast<T>(n.x)), y(static_cast<T>(n.y)) {}
+	//Vector2(Vector2<T> n) : x(static_cast<T>(n.x)), y(static_cast<T>(n.y)) {}
 
-	/**
-	 * Creates and sets to an olc::vf2d
-	 */
-	Vector2(olc::vf2d n) : x(static_cast<T>(n.x)), y(static_cast<T>(n.y)) {}
-	/**
-	 * Creates and sets to an olc::vd2d
-	 */
-	Vector2(olc::vd2d n) : x(static_cast<T>(n.x)), y(static_cast<T>(n.y)){}
-
-
+	
 	/**
 	 * Copy constructor.
 	 * @param src Source of data for new created instance.
@@ -344,28 +309,43 @@ public:
 		return *this;
 	}
 
-	//--------------[ equality operator ]------------------------
-	/**
-	 * Equality test operator
-	 * @param rhs Right hand side argument of binary operator.
-	 * @note Test of equality is based of threshold EPSILON value. To be two
-	 * values equal, must satisfy this condition | lhs.x - rhs.y | < EPSILON,
-	 * same for y-coordinate.
-	 */
-	bool operator==(const Vector2<T>& rhs) const
+	template <typename T>
+	bool operator ==(const Vector2<T>& right)
 	{
-		return (std::abs(x - rhs.x) < EPSILON) && (std::abs(y - rhs.y) < EPSILON);
+		return (x == right.x) && (y == right.y);
 	}
 
-	/**
-	 * Inequality test operator
-	 * @param rhs Right hand side argument of binary operator.
-	 * @return not (lhs == rhs) :-P
-	 */
-	bool operator!=(const Vector2<T>& rhs) const
+	template <typename T>
+	bool operator !=(const Vector2<T>& right)
 	{
-		return !(*this == rhs);
+		return (x != right.x) || (y != right.y);
 	}
+
+	template <typename T>
+	bool operator < (const Vector2<T>& rhs)
+	{
+		return (y < rhs.y) || (y == rhs.y && x < rhs.x);
+		
+	}
+
+	template <typename T>
+	bool operator > (const Vector2<T>& rhs)
+	{
+		return y > rhs.y || (y == rhs.y && x > rhs.x);
+	}
+
+	template <typename T>
+	bool operator <= (const Vector2<T>& rhs)
+	{
+		return y >= rhs.y || (y == rhs.y && x >= rhs.x);
+	}
+
+	template <typename T>
+	bool operator >= (const Vector2<T>& rhs)
+	{
+		return y >= rhs.y || (y == rhs.y && x >= rhs.x);
+	}
+
 
 	//-------------[ unary operations ]--------------------------
 	/**
@@ -447,31 +427,7 @@ public:
 		return (const T*) this;
 	}
 
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vi2d() const { return olc::vi2d(x, y); }
-
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vf2d() const { return olc::vf2d(x, y); }
-
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vd2d() const { return olc::vd2d(x, y); }
-
-	/**
-	 * Conversion to dorkestEngine Vector3
-	 * @return a Vector3 containing x,y,0
-	 */
-	//operator Vector3<T>() const { return Vector3<T>(x, y, 0); }
-
-
+	
 	//-------------[ output operator ]------------------------
 	/**
 	 * Output to stream operator

@@ -50,6 +50,8 @@
 */
 #pragma once
 #include <Util/Math/Geometry/AABB.h>
+#include <SFML/Graphics.hpp>
+#include <Engine/inputManager.h>
 /*
 Camera with settings for 3D viewing
  - orthogonal mode with x, y and z borders
@@ -63,53 +65,54 @@ private:
 	// camera parameters
 
 	//Where in the world we're looking at.
-	Vector3f m_center;
+	Vector2i m_center;
+	sf::RenderWindow* m_window;
 
 	//Screen width/height.
-	int m_sWidth;
-	int m_sHeight;
+	sf::IntRect m_viewSize;
+	sf::IntRect m_mapSize;
 
-	Vector3f m_worldMin;
-	Vector3f m_worldMax;
-	Vector3f m_worldSize;
+	bool isIso = false;
 
 	float m_scale;
 
+	sf::View m_view;
+
 public:
 
-	
-	
-	dorkestCamera(int w, int h);
-	dorkestCamera(const dorkestCamera& src);
-	virtual ~dorkestCamera();
 
-	void setZoom(float zFactor) { m_scale = zFactor; }
+	dorkestCamera(int viewW, int viewH, int top, int left);
+	~dorkestCamera();
+
+	void setZoom(float zFactor) { m_scale = zFactor; m_view.zoom(m_scale); }
 	float getZoom() { return m_scale; }
-	void zoomIn() { m_scale += 0.2f; }
-	void zoomOut() { m_scale -= 0.2f; if (m_scale < 0.01f) m_scale = 0.01f; }
+	void zoomOut() { m_view.zoom(1.1f); m_scale *= 1.1f; }
+	void zoomIn() { m_view.zoom(0.9f); m_scale *= 0.9f; }
 
-
-
-	Vector2i iTOc(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
-	Vector2f iTOc_f(Vector2f vTileSize, float scaleFactor, Vector3f map, Vector2f offset);
-
-	Vector3f cTOi(Vector2f vTileSize, float scaleFactor, Vector2f screen, Vector2f offset);
-
-	Vector3f cTOi_f(Vector2f vTileSize, float scaleFactor, Vector2f screen, Vector2f offset);
-
-	Vector2i MapToScreen(Vector3f map);
-	Vector2d MapToScreen_f(Vector3f map);
-	Vector3f ScreenToMap(Vector2i screen);
+	Vector2i WorldToScreen(Vector3f map);
+	Vector2f ScreenToWorld(Vector2i screen);
 
 	bool canSee(AABB3f box);
 	
 	void setScreenSize(int width, int height);
+	Vector2i getScreenSize();
 
-	void setCenter(float x, float y, float z);
-	
-	int getScreenWidth();
-	int getScreenHeight();
+	Vector2i getScreenTL();
 
-	Vector3f getCenter();
+
+	void setMapSize(int w, int h);
+	Vector2i getMapSize();
+
+	void setMapCorner(int top, int left);
+	Vector2i getMapCorner();
+
+	Vector2f getCenter();
+	void setCenter(float x, float y);
+
+	void render(sf::RenderWindow* window);
+	void update(Vector2i subject, float dTime);
+	void setIsoView();
+	void setTopDownView();
+	bool needsUpdate(Vector2i subject);
 
 };

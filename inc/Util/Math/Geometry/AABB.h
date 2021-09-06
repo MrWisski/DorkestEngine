@@ -2,7 +2,6 @@
 #include "Util/Math/Vector3.h"
 #include <string>
 #include <sstream>
-#include "olcPixelGameEngine.h"
 #include "Util/Log.h"
 
 
@@ -45,7 +44,14 @@ public:
 		return (location > other.location && (location + size) > (other.location + other.size));
 	}
 
+	bool contains(Vector2<T> p) {
+		bool l, r;
+		l = (this->getMin() <= p);
+		r = (p <= this->getMax());
+		return (l && r);
+		
 
+	}
 
 	bool contains(AABB2<T> b) {
 		const bool htlut7[7] = { false, false, true, false, false, false, true };
@@ -222,7 +228,11 @@ public:
 		return (location > other.location && (location + size) > (other.location + other.size));
 	}
 
-	
+	bool contains(Vector3<T> p) {
+		
+		return this->getMin() < p < this->getMax();
+	}
+
 
 	bool contains(AABB3<T> b) {
 		const bool htlut7[7] = { false, false, false, false, false, true, true };
@@ -319,7 +329,7 @@ public:
 	 * @return The maximum value (location+size)
 	 */
 	Vector3<T> getMax() {
-		debugss << "getMax = " << location.x << "+" << size.x << ", " << "getMax = " << location.y << "+" << size.y << ", " << "getMax = " << location.z << "+" << size.z;
+		//debugss << "getMax = " << location.x << "+" << size.x << ", " << "getMax = " << location.y << "+" << size.y << ", " << "getMax = " << location.z << "+" << size.z;
 		return Vector3<T>(location.x + size.x, location.y + size.y, location.z + size.z);
 	}
 

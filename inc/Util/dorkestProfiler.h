@@ -54,6 +54,7 @@
 #include <windows.h>
 #include <profileapi.h>
 #include <errhandlingapi.h>
+#include <algorithm>
 
 /// <summary>
 /// The main profiling class. 

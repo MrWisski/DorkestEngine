@@ -1,11 +1,14 @@
 #pragma once
 #include "Util/Math/Vector3.h"
-#include <olcPixelGameEngine.h>
+#include <Util/Color.h>
+
+#include <algorithm>
+#include <math.h>
 
 
 class LightSource {
 public:
-	olc::Pixel color;
+	Colorf color;
 
 	float constant = 0.2f;
 	float linear = 0.4f;
@@ -24,13 +27,13 @@ public:
 
 class LightSink {
 public:
-	std::vector<std::pair<float, olc::Pixel>> staticLights;
-	olc::Pixel combinedColor = olc::BLACK;
+	std::vector<std::pair<float, Colorf>> staticLights;
+	Colorf combinedColor = Colorf(0,0,0,1);
 };
 
 class lightFunc {
 public:
-	static olc::Pixel mixColors(olc::Pixel color_a, olc::Pixel color_b, std::string mode = "mix", float t = -1.0f, float gamma = 2.2f) {
+	static Colorf mixColors(Colorf color_a, Colorf color_b, std::string mode = "mix", float t = -1.0f, float gamma = 2.2f) {
 	
 		assert(mode == "mix" || mode == "blend");
 	
@@ -42,15 +45,15 @@ public:
 		float tinv = 0.0001f;
 		if (t <= 1) {
 			tinv = 1 - t;
-			t = std::max(0.0f, std::min(t, 1.0f));
+			t = std::max<float>(0.0f, std::min<float>(t, 1.0f));
 		}
 		else {
 
 			float tinv = (int)(255 - t);
-			t = std::max(0.0f, std::min(t, 1.0f));
+			t = std::max<float>(0.0f, std::min<float>(t, 1.0f));
 			t = t * 255;
 		}
-		olc::Pixel ret;
+		Colorf ret;
 
 
 		if (mode == "mix" && gamma > 0) {
@@ -82,7 +85,7 @@ public:
 					float nr = std::powf(std::powf(color_a.r,gamma) + (std::powf(color_b.r,gamma)*s) * (1 - s), 1 / gamma);
 					float ng = std::powf(std::powf(color_a.g, gamma) + (std::powf(color_b.g, gamma) * s) * (1 - s), 1 / gamma);
 					float nb = std::powf(std::powf(color_a.b, gamma) + (std::powf(color_b.b, gamma) * s) * (1 - s), 1 / gamma);
-					ret = olc::Pixel(nr, ng, nb, a);
+					ret = Colorf(nr, ng, nb, a);
 				}
 				
 		}

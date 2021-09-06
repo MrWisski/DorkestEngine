@@ -46,10 +46,10 @@ std::shared_ptr<dorkestBaseEntity> MapSeg::createEntity()
 
 std::shared_ptr<dorkestBaseEntity> MapSeg::createTerrainEntity(AABB3f bounds, std::string sprite)
 {
-	Vector2i screenLoc = this->owner->getCamera()->MapToScreen(bounds.getLocation());
-	TerrainEntity te(this->entReg, bounds, screenLoc, sprite);
+	//Vector2i screenLoc = this->owner->getCamera()->MapToScreen(bounds.getLocation());
+	//TerrainEntity te(this->entReg, bounds, screenLoc, sprite);
 
-	return std::make_shared<dorkestBaseEntity>(te);
+	return nullptr;//std::make_shared<dorkestBaseEntity>(te);
 	
 }
 
@@ -81,7 +81,7 @@ void MapSeg::updateLighting(std::vector<dorkestBaseEntity*> staticLights, std::v
 		dorkestBaseEntity e(this->entReg, en);
 		//OK, first we need to get the position, and lightsink component, for this entity.
 		c_lightSink c = e.getComponent<c_lightSink>();
-		c.data.combinedColor = olc::WHITE;
+		c.data.combinedColor = Colorf(1,1,1,1);
 		//finally, push our updated lightsink data back to the registry.
 		e.updateComponent<c_lightSink>(c);
 		//And let the scene know the scene is no longer clean.
@@ -126,7 +126,7 @@ void MapSeg::updateLighting(std::vector<dorkestBaseEntity*> staticLights, std::v
 				//Calculate the attenuation.
 				float inten = tl.data.getIntensityFromDistance(dist);
 				if (inten > 0.021f) {
-					std::pair<float, olc::Pixel> lPair;
+					std::pair<float, Colorf> lPair;
 					lPair.first = inten;
 					lPair.second = tl.data.color;
 					c.data.staticLights.push_back(lPair);
@@ -137,10 +137,10 @@ void MapSeg::updateLighting(std::vector<dorkestBaseEntity*> staticLights, std::v
 
 			std::stringstream ss;
 			ss << std::endl;
-			olc::Pixel lcol = olc::BLACK;
+			Colorf lcol = olc::BLACK;
 			for (auto lpair : c.data.staticLights) {
 					
-				olc::Pixel p = lightFunc::mixColors(lcol, (lpair.second * lpair.first),"mix",0.5f);
+				Colorf p = lightFunc::mixColors(lcol, (lpair.second * lpair.first),"mix",0.5f);
 				lcol = lcol + (p / 2);
 				
 			}
@@ -178,7 +178,6 @@ void MapSeg::sort()
 }
 
 void MapSeg::drawPlane(Colorf c) {
-	return;
 	for (int x = 0; x < SEGMENT_DIMENSION; x++)
 		for (int y = 0; y < SEGMENT_DIMENSION; y++) {
 			Vector3f poss = this->bBox.getLocation() + Vector3f(x, y, 0);

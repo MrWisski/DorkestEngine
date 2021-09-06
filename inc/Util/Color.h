@@ -7,13 +7,14 @@
 const double epsilon = 4.37114e-05;
 #define EPSILON epsilon
 #endif
+#include <cstdarg>
 
 class Colorf
 {
 public:
 
-	float r, g, b;
-	float alpha;
+	float r, g, b, a;
+	
 
 
 
@@ -24,7 +25,7 @@ public:
 	 * Creates and sets to (0,0,0,0)
 	 */
 	Colorf()
-		: r(0.0f), g(0.0f), b(0.0f), alpha(0.0f)
+		: r(0.0f), g(0.0f), b(0.0f), a(0.0f)
 	{
 	}
 
@@ -34,8 +35,8 @@ public:
 		this->r = r / 255.0f;
 		this->g = g / 255.0f;
 		this->b = b / 255.0f;
-		this->alpha = a / 255.0f;
-		//debugss << " OUT : " << this->r << " " << this->g << " " << this->b << " " << this->alpha;
+		this->a = a / 255.0f;
+		//debugss << " OUT : " << this->r << " " << this->g << " " << this->b << " " << this->a;
 	}
 
 	Colorf(float r, float g, float b, float a)
@@ -46,8 +47,8 @@ public:
 		else this->g = g;
 		if (b < 0 || b > 1) { this->b = 0; error("Invalid value for blue color component - set to zero. Must be between 0.0f and 1.0f."); }
 		else this->b = b;
-		if (a < 0 || a > 1) { this->alpha = 0; error("Invalid value for red color component - set to zero. Must be between 0.0f and 1.0f."); }
-		else this->alpha = a;
+		if (a < 0 || a > 1) { this->a = 0; error("Invalid value for red color component - set to zero. Must be between 0.0f and 1.0f."); }
+		else this->a = a;
 	}
 
 	/**
@@ -55,7 +56,7 @@ public:
 	 * @param src Source of data for new created Colorf instance.
 	 */
 	Colorf(const Colorf& src)
-		: r(src.r), g(src.g), b(src.b), alpha(src.alpha)
+		: r(src.r), g(src.g), b(src.b), a(src.a)
 	{
 	}
 
@@ -67,17 +68,17 @@ public:
 		r = (float)(rand() % 255) /255.0f;
 		g = (float)(rand() % 255) / 255.0f;
 		b = (float)(rand() % 255) / 255.0f;
-		alpha = 1.0f;
-		debugss << r << ", " << g << ", " << b << ", " << alpha << ".";
+		a = 1.0f;
+		debugss << r << ", " << g << ", " << b << ", " << a << ".";
 	}
 
 	/// <summary>
 	/// Creates dorkestColorf from
 	/// </summary>
 	/// <param name="color"></param>
-	Colorf(olc::Pixel color) : r(color.r / 255), g(color.g / 255), b(color.b / 255), alpha(color.a / 255) {}
+	//Colorf(Colorf color) : r(color.r / 255), g(color.g / 255), b(color.b / 255), a(color.a / 255) {}
 
-	operator olc::Pixel() { return olc::Pixel(r * 255, g * 255, b * 255, alpha * 255); }
+	operator Colorf() { return Colorf(r * 255, g * 255, b * 255, a * 255); }
 
 	operator std::string() { return toString(); }
 
@@ -92,7 +93,7 @@ public:
 		r = rhs.r;
 		g = rhs.g;
 		b = rhs.b;
-		alpha = rhs.alpha;
+		a = rhs.a;
 		return *this;
 	}
 
@@ -101,7 +102,7 @@ public:
 	 * @param n Array index
 	 * @return For n = 0, reference to r coordinate, n = 1
 	 * reference to g coordinate, n = 2 reference to b,
-	 * else reference to alpha coordinate.
+	 * else reference to a coordinate.
 	 */
 	float& operator[](int n)
 	{
@@ -113,7 +114,7 @@ public:
 		else if (2 == n)
 			return b;
 		else
-			return alpha;
+			return a;
 	}
 
 	/**
@@ -121,7 +122,7 @@ public:
 	 * @param n Array index
 	 * @return For n = 0, reference to r coordinate, n = 1
 	 * reference to g coordinate, n = 2 reference to b,
-	 * else reference to alpha coordinate.
+	 * else reference to a coordinate.
 	 */
 	const float& operator[](int n) const
 	{
@@ -133,7 +134,7 @@ public:
 		else if (2 == n)
 			return b;
 		else
-			return alpha;
+			return a;
 	}
 
 	//---------------[ color aritmetic operator ]--------------
@@ -149,7 +150,7 @@ public:
 			std::fminf(r + rhs.r, 1.0f),
 			std::fminf(g + rhs.g, 1.0f),
 			std::fminf(b + rhs.b, 1.0f),
-			std::fminf(alpha + rhs.alpha, 1.0f)
+			std::fminf(a + rhs.a, 1.0f)
 		);
 	}
 
@@ -160,7 +161,7 @@ public:
 			std::fmaxf(std::fminf(r - rhs.r, 1.0f),0.0f),
 			std::fmaxf(std::fminf(g - rhs.g, 1.0f), 0.0f),
 			std::fmaxf(std::fminf(b - rhs.b, 1.0f), 0.0f),
-			alpha);
+			a);
 	}
 
 	Colorf operator*(const Colorf rhs) const
@@ -169,7 +170,7 @@ public:
 			std::fmaxf(std::fminf(r * rhs.r, 1.0f), 0.0f),
 			std::fmaxf(std::fminf(g * rhs.g, 1.0f), 0.0f),
 			std::fmaxf(std::fminf(b * rhs.b, 1.0f), 0.0f),
-			alpha);
+			a);
 	}
 
 
@@ -184,7 +185,7 @@ public:
 			std::fmaxf(std::fminf(std::fminf(r,rhs.r) / std::fmaxf(r, rhs.r), 1.0f), 0.0f),
 			std::fmaxf(std::fminf(std::fminf(g, rhs.g) / std::fmaxf(g, rhs.g), 1.0f), 0.0f),
 			std::fmaxf(std::fminf(std::fminf(b, rhs.b) / std::fmaxf(b, rhs.b), 1.0f), 0.0f),
-			alpha);
+			a);
 */
 	}
 	/*
@@ -193,7 +194,7 @@ public:
 		r += rhs.r;
 		g += rhs.g;
 		b += rhs.b;
-		alpha += rhs.alpha;
+		a += rhs.a;
 		return *this;
 	}
 
@@ -202,7 +203,7 @@ public:
 		r -= rhs.r;
 		g -= rhs.g;
 		b -= rhs.b;
-		alpha -= rhs.alpha;
+		a -= rhs.a;
 		return *this;
 	}
 
@@ -212,7 +213,7 @@ public:
 		r *= rhs.r;
 		g *= rhs.g;
 		b *= rhs.b;
-		alpha *= rhs.alpha;
+		a *= rhs.a;
 		return *this;
 	}
 
@@ -222,25 +223,25 @@ public:
 		r /= rhs.r;
 		g /= rhs.g;
 		b /= rhs.b;
-		alpha /= rhs.alpha;
+		a /= rhs.a;
 		return *this;
 	}
 	*/
 
 
 	Colorf blendWfront(Colorf front) {
-		float na = (1.0 - (1.0 - alpha) * (1.0 - front.alpha));
-		float nr = (r * (1.0 - front.alpha) + front.r * front.alpha);
-		float ng = (g * (1.0 - front.alpha) + front.g * front.alpha);
-		float nb = (b * (1.0 - front.alpha) + front.b * front.alpha);
+		float na = (1.0 - (1.0 - a) * (1.0 - front.a));
+		float nr = (r * (1.0 - front.a) + front.r * front.a);
+		float ng = (g * (1.0 - front.a) + front.g * front.a);
+		float nb = (b * (1.0 - front.a) + front.b * front.a);
 		return Colorf(std::fminf(nr, 1.0f), std::fminf(ng, 1.0f), std::fminf(nb, 1.0f), std::fminf(na, 1.0f));
 	}
 
 	Colorf blendWback(Colorf back) {
-		float na = (1.0 - (1.0 - back.alpha) * (1.0 - alpha));
-		float nr = (back.r * (1.0 - alpha) + r * alpha);
-		float ng = (back.g * (1.0 - alpha) + g * alpha);
-		float nb = (back.b * (1.0 - alpha) + b * alpha);
+		float na = (1.0 - (1.0 - back.a) * (1.0 - a));
+		float nr = (back.r * (1.0 - a) + r * a);
+		float ng = (back.g * (1.0 - a) + g * a);
+		float nb = (back.b * (1.0 - a) + b * a);
 		return Colorf(std::fminf(nr, 1.0f), std::fminf(ng, 1.0f), std::fminf(nb, 1.0f), std::fminf(na, 1.0f));
 	}
 
@@ -278,7 +279,7 @@ public:
 		float nr = 1 - ((1 - r) * (1 - c.r));
 		float ng = 1 - ((1 - g) * (1 - c.g));
 		float nb = 1 - ((1 - b) * (1 - c.b));
-		return Colorf(std::fminf(nr, 1.0f), std::fminf(ng, 1.0f), std::fminf(nb, 1.0f), alpha);
+		return Colorf(std::fminf(nr, 1.0f), std::fminf(ng, 1.0f), std::fminf(nb, 1.0f), a);
 	}
 
 	//--------------[ equiality operator ]------------------------
@@ -287,12 +288,12 @@ public:
 	 * @param rhs Right hand side argument of binary operator.
 	 * @note Test of equality is based of threshold EPSILON value. To be two
 	 * values equal, must satisfy this condition | lhs.r - rhs.g | < EPSILON,
-	 * same for g-coordinate, b-coordinate, and alpha-coordinate.
+	 * same for g-coordinate, b-coordinate, and a-coordinate.
 	 */
 	bool operator==(const Colorf& rhs) const
 	{
 		return fabsf(r - rhs.r) < EPSILON && fabsf(g - rhs.g) < EPSILON && fabsf(b - rhs.b) < EPSILON
-			&& fabsf(alpha - rhs.alpha) < EPSILON;
+			&& fabsf(a - rhs.a) < EPSILON;
 	}
 
 	/**
@@ -312,7 +313,7 @@ public:
 	 */
 	Colorf operator-() const
 	{
-		return Colorf(1.0f - r, 1.0f - g, 1.0f - b, alpha);
+		return Colorf(1.0f - r, 1.0f - g, 1.0f - b, a);
 	}
 
 	//--------------[ scalar vector operator ]--------------------
@@ -323,7 +324,7 @@ public:
 	 */
 	Colorf operator+(float rhs) const
 	{
-		return Colorf(r + rhs, g + rhs, b + rhs, alpha);
+		return Colorf(r + rhs, g + rhs, b + rhs, a);
 	}
 
 	/**
@@ -332,7 +333,7 @@ public:
 	 */
 	Colorf operator-(float rhs) const
 	{
-		return Colorf(r - rhs, g - rhs, b - rhs, alpha);
+		return Colorf(r - rhs, g - rhs, b - rhs, a);
 	}
 
 	/**
@@ -342,16 +343,16 @@ public:
 	Colorf operator*(float rhs) const
 	{
 		if (rhs > 1)
-			return Colorf(r, g, b, alpha);
+			return Colorf(r, g, b, a);
 		else
-			return Colorf(r * rhs, g * rhs, b * rhs, alpha);
+			return Colorf(r * rhs, g * rhs, b * rhs, a);
 	}
 
 
 
 	Colorf operator/(float rhs) const
 	{
-		return Colorf(r / rhs, g / rhs, b / rhs, alpha );
+		return Colorf(r / rhs, g / rhs, b / rhs, a );
 	}
 	/*
 
@@ -360,7 +361,7 @@ public:
 		r += rhs;
 		g += rhs;
 		b += rhs;
-		alpha += rhs;
+		a += rhs;
 		return *this;
 	}
 
@@ -370,7 +371,7 @@ public:
 		r -= rhs;
 		g -= rhs;
 		b -= rhs;
-		alpha -= rhs;
+		a -= rhs;
 		return *this;
 	}
 
@@ -380,7 +381,7 @@ public:
 		r *= rhs;
 		g *= rhs;
 		b *= rhs;
-		alpha *= rhs;
+		a *= rhs;
 		return *this;
 	}
 
@@ -390,7 +391,7 @@ public:
 		r /= rhs;
 		g /= rhs;
 		b /= rhs;
-		alpha /= rhs;
+		a /= rhs;
 		return *this;
 	}
 	*/
@@ -404,14 +405,14 @@ public:
 	 */
 	float lenSq() const
 	{
-		return r * r + g * g + b * b + alpha * alpha;
+		return r * r + g * g + b * b + a * a;
 	}
 
 
-	Colorf floor() const { return Colorf(std::floor(r), std::floor(g), std::floor(b), std::floor(alpha)); }
-	Colorf ceil() const { return Colorf(std::ceil(r), std::ceil(g), std::ceil(b), std::ceil(alpha)); }
-	Colorf max(const Colorf& v) const { return Colorf(std::max(r, v.r), std::max(g, v.g), std::max(b, v.b), std::max(alpha, v.alpha)); }
-	Colorf min(const Colorf& v) const { return Colorf(std::min(r, v.r), std::min(g, v.g), std::min(b, v.b), std::min(alpha, v.alpha)); }
+	Colorf floor() const { return Colorf(std::floor(r), std::floor(g), std::floor(b), std::floor(a)); }
+	Colorf ceil() const { return Colorf(std::ceil(r), std::ceil(g), std::ceil(b), std::ceil(a)); }
+	Colorf maxc(const Colorf& v) const { return Colorf(std::max(r, v.r), std::max(g, v.g), std::max(b, v.b), std::max(a, v.a)); }
+	Colorf minc(const Colorf& v) const { return Colorf(std::min(r, v.r), std::min(g, v.g), std::min(b, v.b), std::min(a, v.a)); }
 
 
 	//-------------[ conversion ]-----------------------------
@@ -450,7 +451,7 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& lhs, const Colorf& rhs)
 	{
-		lhs << "[" << rhs.r << "," << rhs.g << "," << rhs.b << "," << rhs.alpha << "]";
+		lhs << "[" << rhs.r << "," << rhs.g << "," << rhs.b << "," << rhs.a << "]";
 		return lhs;
 	}
 

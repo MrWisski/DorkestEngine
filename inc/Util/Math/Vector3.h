@@ -5,8 +5,6 @@
 
 #include <math.h>
 #include <sstream>
-#include "Vector2.h"
-#include <olcPixelGameEngine.h>
 #include <cmath>
 #include <cstring>
 #include <iostream>
@@ -14,6 +12,9 @@
 #include <string>
 #include <cassert>
 #include <cstdio>
+
+#include <Util/Math/Vector2.h>
+#include <Util/Color.h>
 
 #ifndef M_PI
 #define M_PI           3.14159265358979323846  /* pi */
@@ -561,30 +562,12 @@ public:
 		return (const T*)this;
 	}
 
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vi2d() const { return olc::vi2d(x, y); }
-
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vf2d() const { return olc::vf2d(x, y); }
-
-	/**
-	 * Conversion to OneLoneCoder::PGE Vector2 operator
-	 * @return a vi2d containing (x,y)
-	 */
-	operator olc::vd2d() const { return olc::vd2d(x, y); }
-
-
+	
 	/**
 	 * Conversion to OneLoneCoder::PGE Pixel operator
 	 * @return a Pixel color value containing (x/r,y/g,z/b,w/a)
 	 */
-	operator olc::Pixel() const { return olc::Pixel(r, g, b, 255); }
+	operator Colorf() const { return Colorf(r, g, b, 255); }
 
 	/**
 	 * Conversion to dorkestEngine Vector2

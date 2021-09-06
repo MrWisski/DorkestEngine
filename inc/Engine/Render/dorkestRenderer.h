@@ -59,10 +59,13 @@
 #include "Util/Math/Geometry/AABB.h"
 #include <Util/Color.h>
 #include <Util/Math/Geometry/nGons.h>
+#include <Util/Math/Geometry/Ray.h>
+
+#include <SFML/Graphics.hpp>
 
 class dorkestSprite;
 
-#define dorkestColor olc::Pixel
+#define dorkestColor Colorf
 
 
 /// <summary>
@@ -77,12 +80,13 @@ public:
 	/// Initializes the Renderer.
 	/// </summary>
 	/// <param name="useCamera">a sharedptr to the camera to use for all calcs - use setCam to change!</param>
-	dorkestRenderer(std::shared_ptr<dorkestCamera> useCamera) : cam(useCamera) {};
-	void setCam(std::shared_ptr<dorkestCamera> useCamera) { this->cam = useCamera; }
+	dorkestRenderer(sf::RenderWindow* win, dorkestCamera* useCamera) : m_camera(useCamera), m_window(win) {};
+	void setCam(dorkestCamera* useCamera) { this->m_camera = useCamera; }
 
+	~dorkestRenderer() {};
 
-
-	~dorkestRenderer() = default;
+	void clearWindow();
+	void swapBuffer();
 
 	/// <summary>
 	/// Draws a sprite
@@ -93,7 +97,7 @@ public:
 	/// <param name="forceColor">If you want to override the base color defined when the sprite was created. This color, if not (0,0,0,0), will be used instead.</param>
 	/// <param name="forceScale">If you want to override the base scaling defined when the sprite was created. This scale if not -1, will be used instead.</param>
 	/// <param name="forceSize">If you want to override the base size defined when the sprite was created. This size, if not (-1,-1), will be used instead.</param>
-	void drawSprite(Vector3f mapPos, std::string name, sType spriteType = sType::DIFFUSE, Colorf forceColor = Colorf(0, 0, 0, 0), float forceScale = -1.0f, Vector2f forceSize = Vector2f(-1, -1));
+	void drawSprite(Vector2i mapPos, std::string name, float forceScale = -1.0f, Vector2f forceSize = Vector2f(-1, -1), Colorf forceColor = Colorf(0, 0, 0, 0) );
 
 	/// <summary>
 	/// Draws a line of text to the SCREEN via Row/Text Align
@@ -103,7 +107,7 @@ public:
 	/// <param name="color">The color to render the string in</param>
 	/// <param name="TA">Text alignment of the string : RIGHT, CENTER, LEFT</param>
 	/// <param name="scale">Scale to use for the text</param>
-	void drawTextRow(int row, std::string Str, float scale = 1.0f, olc::Pixel color = Colorf(255, 255, 255, 255), textAlign TA = textAlign::NONE);
+	void drawTextRow(sf::Font* font, int row, std::string Str, float scale = 1.0f, Colorf color = Colorf(255, 255, 255, 255), textAlign TA = textAlign::NONE);
 
 	/// <summary>
 	/// Draws a line of text on the screen
@@ -112,7 +116,7 @@ public:
 	/// <param name="Str">String to render.</param>
 	/// <param name="color">Color to render the string in.</param>
 	/// <param name="TA">Text alignment of the string : RIGHT, CENTER, LEFT</param>
-	void drawTextPos(Vector2f screenPos, std::string Str, float scale = 1.0f, olc::Pixel color = Colorf(255, 255, 255, 255), textAlign TA = textAlign::NONE);
+	void drawTextPos(sf::Font* font, Vector2f screenPos, std::string Str, float scale = 1.0f, Colorf color = Colorf(255, 255, 255, 255), textAlign TA = textAlign::NONE);
 
 	/// <summary>
 	/// Draws a ray
@@ -149,20 +153,13 @@ public:
 	void drawAABB3(AABB3f box, Colorf col = Colorf(255,255,255,255));
 	void drawAABB2(AABB2i box, Colorf col = Colorf(255, 255, 255, 255));
 
-	/// <summary>
-	/// For debugging - forces sprite/decal rendering functions to ignore olc::Decals, and JUST use olc::Sprites
-	/// </summary>
-	/// <param name="bvalue"></param>
-	void forceIgnoreDecal(bool bvalue) { this->forceIgnoreDecalFlag = bvalue; }
 
 	friend class dorkestScene;
 protected:
 	bool drawToScreen(Vector2i screenPos, std::string name, sType spriteType, Colorf color = Colorf(0,0,0,0), float scale = -1.0f, Vector2f size = Vector2i(-1,-1));
 	
-	bool drawDecalINTERNAL(Vector2f dest, Vector2f destSize, olc::Decal*, Vector2f src, Vector2f srcSize, olc::Pixel color);
-	bool drawSpriteINTERNAL(Vector2f dest, int scale, olc::Sprite*, Vector2f src, Vector2f srcSize);
 private:
-	std::shared_ptr<dorkestCamera> cam = nullptr;
-	bool forceIgnoreDecalFlag = false;
-
+	dorkestCamera* m_camera = nullptr;
+	sf::RenderWindow* m_window = nullptr;
+	
 };

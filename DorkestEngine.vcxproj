@@ -82,13 +82,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Coding\CPP\DarkestEngine\inc;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master;C:\Coding\CPP\DarkestEngine\lib\glew-2.1.0\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Coding\ImGui-Addons\FileBrowser;C:\Coding\CPP\DarkestEngine\inc;D:\Coding\SFML-2.5.1\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;D:\Coding\imgui;D:\Coding\imgui-sfml;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Coding\SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>D:\Coding\imgui;D:\Coding\imgui-sfml;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Coding\CPP\DarkestEngine\inc;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master\Extensions;C:\Coding\CPP\DarkestEngine\lib\olcPixelGameEngine-master;C:\Coding\CPP\DarkestEngine\lib\glew-2.1.0\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Coding\CPP_DEV_LIBS\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Coding\ImGui-Addons\FileBrowser;C:\Coding\CPP\DarkestEngine\inc;D:\Coding\SFML-2.5.1\include;C:\Coding\CPP\DarkestEngine\lib\entt-master\src;D:\Coding\imgui;D:\Coding\imgui-sfml;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Coding\SFML-2.5.1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>D:\Coding\imgui;D:\Coding\imgui-sfml;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -126,14 +128,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;freetype.lib;winmm.lib;gdi32.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,7 +144,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -151,46 +153,57 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;freetype.lib;winmm.lib;gdi32.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-graphics-s-d.lib;sfml-network-s-d.lib;sfml-audio-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\dorkestMap.cpp" />
+    <ClCompile Include="src\dorkestSprite.cpp" />
+    <ClCompile Include="src\dorkestSpriteSheet.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\imgui-SFML.cpp" />
+    <ClCompile Include="src\imgui.cpp" />
+    <ClCompile Include="src\ImGuiFileBrowser.cpp" />
+    <ClCompile Include="src\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui_widgets.cpp" />
+    <ClCompile Include="src\inputManager.cpp" />
     <ClCompile Include="src\MapSeg.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="src\dorkestCamera.cpp" />
     <ClCompile Include="src\dorkestProfiler.cpp" />
     <ClCompile Include="src\dorkestScene.cpp" />
     <ClCompile Include="src\dorkestSpriteMan.cpp" />
-    <ClCompile Include="src\Engine.cpp" />
-    <ClCompile Include="src\imgui.cpp" />
-    <ClCompile Include="src\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui_widgets.cpp" />
-    <ClCompile Include="src\instPGE.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\sheetEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\CPP_DEV_LIBS\olcPixelGameEngine-master\Extensions\olcPGEX_DX11ShadersPlus.h" />
     <ClInclude Include="inc\ECS\components.h" />
     <ClInclude Include="inc\ECS\dorkestBaseEntity.h" />
     <ClInclude Include="inc\ECS\dorkestScene.h" />
     <ClInclude Include="inc\ECS\Systems\RenderSystem.h" />
     <ClInclude Include="inc\ECS\TerrainEntity.h" />
     <ClInclude Include="inc\Engine\Engine.h" />
-    <ClInclude Include="inc\instPGE.h" />
+    <ClInclude Include="inc\Engine\inputManager.h" />
+    <ClInclude Include="inc\Engine\Render\dorkestSpriteSheet.h" />
     <ClInclude Include="inc\Engine\Render\dorkestCamera.h" />
     <ClInclude Include="inc\Engine\Render\dorkestSprite.h" />
     <ClInclude Include="inc\Engine\Render\dorkestSpriteManager.h" />
     <ClInclude Include="inc\Engine\Render\dorkestRenderer.h" />
-    <ClInclude Include="inc\Engine\imguiWindows\DebugIMGUI.h" />
+    <ClInclude Include="inc\imguiWindows\ConsoleIMGUI.h" />
+    <ClInclude Include="inc\imguiWindows\DebugIMGUI.h" />
+    <ClInclude Include="inc\imguiWindows\imfilebrowser.h" />
+    <ClInclude Include="inc\imguiWindows\SheetDataIMGUI.h" />
+    <ClInclude Include="inc\imguiWindows\spriteInfoIMGUI.h" />
+    <ClInclude Include="inc\sheetEditor.h" />
     <ClInclude Include="inc\Util\Color.h" />
     <ClInclude Include="inc\Util\dorkestProfiler.h" />
+    <ClInclude Include="inc\Util\EventSystem.h" />
+    <ClInclude Include="inc\Util\ImGuiFileBrowser.h" />
+    <ClInclude Include="inc\Util\JSON.h" />
     <ClInclude Include="inc\Util\Math\Geometry\AABB.h" />
-    <ClInclude Include="inc\Engine\imguiWindows\ConsoleIMGUI.h" />
     <ClInclude Include="inc\Util\Log.h" />
     <ClInclude Include="inc\Util\Math\Geometry\FibSphere.h" />
     <ClInclude Include="inc\Util\Math\Geometry\Point.h" />

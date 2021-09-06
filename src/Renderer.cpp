@@ -50,7 +50,6 @@
 */
 
 #include <Engine/Render/dorkestRenderer.h>
-#include "instPGE.h"
 #include "Util/Log.h"
 #include <Engine/Render/dorkestSpriteManager.h>
 #include <Engine/Render/dorkestSprite.h>
@@ -59,142 +58,161 @@
 #include <Util/Math/Geometry/Ray.h>
 #include <algorithm>
 
-void dorkestRenderer::drawSprite(Vector3f mapPos, std::string name, sType spriteType, Colorf forceColor, float forceScale, Vector2f forceSize)
-{
-	//Do we have a valid sprite to draw?
-	dorkestSprite* spr = dorkestSpriteMan::getInstance()->getDorkestSprite(name);
-	if ((spr == nullptr)) {
-		error("Cannot find sprite with name " + name);
+
+void dorkestRenderer::clearWindow() {
+	if (m_window != nullptr) {
+		m_window->clear();
+	}
+}
+void dorkestRenderer::swapBuffer() {
+	if (m_window != nullptr) {
+		m_window->display();
+	}
+
+}
+
+void dorkestRenderer::drawSprite(Vector2i mapPos, std::string name, float forceScale, Vector2f forceSize, Colorf forceColor){
+	if (m_window == nullptr) {
+		error("No window.");
 		return;
 	}
 
-	if (forceColor == Colorf(0, 0, 0, 0))
-		forceColor = spr->getSpriteTint();
+	dorkestSprite* s = dorkestSpriteMan::getInstance()->getDorkestSprite(name);
+	if (s == nullptr) { error("No sprite found!!"); return; }
+	sf::Sprite* spr = s->getSprite();
+	if (spr == nullptr) { error("COuld not create spr!"); return; }
+	spr->setPosition({ (float)mapPos.x,(float)mapPos.y });
+	spr->setScale(forceScale, forceScale);
+	m_window->draw(*spr);
 
-	if (forceScale == -1.0f) {
-		forceScale = spr->getScaleFactor();
-	} 
-	if (forceSize == Vector2f(-1.0f, -1.0f))
-		forceSize = Vector2f(spr->getSpriteSize());
-
-	Vector2i Screent = cam->iTOc(spr->getSpriteSize(), forceScale, mapPos, { 0,0 });// this->MapToScreen(size, scale.x, Vector3d(WorldX, WorldY, WorldZ), { 0,0 });
-
-	this->drawToScreen(Screent, name, spriteType, forceColor, forceScale, forceSize);
 
 }
 
-void dorkestRenderer::drawTextRow(int row, std::string Str, float scale, olc::Pixel color, textAlign TA)
-{
-	Vector2i al = Vector2i(0,row * (instPGE::getInstance()->GetTextSize(Str).y * scale));
-	switch (TA) {
-	case LEFT:
-		al.x = 0;
-		instPGE::getInstance()->DrawString(al, Str, color, scale);
-		break;
-	case RIGHT:
-		al.x = this->cam->getScreenWidth() - (instPGE::getInstance()->GetTextSize(Str).x * scale);
-		instPGE::getInstance()->DrawString(al, Str, color, scale);
-		break;
-	case CENTER:
-		al.x = (this->cam->getScreenWidth() / 2) - ((instPGE::getInstance()->GetTextSize(Str).x * scale) / 2);
-		instPGE::getInstance()->DrawString(al, Str, color, scale);
-		break;
-	default:
-		al.x = 0;
-		instPGE::getInstance()->DrawString(al, Str, color, 2);
+void dorkestRenderer::drawTextRow(sf::Font* font, int row, std::string Str, float scale, Colorf color, textAlign TA){
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
 	}
+	sf::Text t;
+	t.setFont(*font);
+	t.setString(Str);
+	
+	int size = 24 * scale;
+	//	debug("Using size : " + std::to_string(size));
+	t.setCharacterSize(size);
+
+
+	t.setFillColor(sf::Color::White);
+	t.setOutlineThickness(1);
+	t.setOutlineColor(sf::Color::Green);
+
+	t.setPosition(m_camera->getScreenTL().x, m_camera->getScreenTL().y + ( t.getLocalBounds().height * row));
+	m_window->draw(t);
 
 }
 
-void dorkestRenderer::drawTextPos(Vector2f screenPos, std::string Str, float scale, olc::Pixel color, textAlign TA)
-{
-	Vector2f al = screenPos;
-	switch (TA) {
-	case LEFT:
-		al.x = 0;
-		instPGE::getInstance()->DrawString(al, Str, color, 2);
-		break;
-	case RIGHT: 
-		al.x = this->cam->getScreenWidth() - (instPGE::getInstance()->GetTextSize(Str).x*2) ;
-		instPGE::getInstance()->DrawString(al, Str, color, 2);
-		break;
-	case CENTER:
-		al.x = (this->cam->getScreenWidth() / 2) - ((instPGE::getInstance()->GetTextSize(Str).x * 2)/2);
-		instPGE::getInstance()->DrawString(al, Str, color, 2);
-		break;
-	default:
-		instPGE::getInstance()->DrawString(al, Str, color, 2);
-
+void dorkestRenderer::drawTextPos(sf::Font* font, Vector2f screenPos, std::string Str, float scale, Colorf color, textAlign TA){
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
 	}
+	if (font == nullptr) { error("No font."); return; }
+
+	sf::Text t;
+	t.setFont(*font);
+	t.setString(Str);
+
+	int size = 24 * scale;
+//	debug("Using size : " + std::to_string(size));
+	t.setCharacterSize(size);
+
+//	debug("Using color : " + color.toStr());
+	t.setFillColor(sf::Color(color.r*255, color.g * 255, color.b * 255, color.a * 255));
+	t.setOutlineThickness(1);
+	t.setOutlineColor(sf::Color::Green);
+
+	t.setPosition({ screenPos.x,screenPos.y });
+	m_window->draw(t);
+
 	
 }
 
 void dorkestRenderer::drawRay(Ray<float> ray, Colorf sCol, Colorf rCol) {
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
 
 	ray.dir.norm();
 	ray.invdir.norm();
 
-	Vector2i so = cam->MapToScreen( ray.orig);
-	so.y += 8;
-	Vector2i se = cam->MapToScreen(ray.orig + (ray.dir * ray.tmax));
-	LineSeg2Di lseg = LineSeg2Di(so,se);
+	//Vector2i so = m_camera->MapToScreen( ray.orig);
+	//so.y += 8;
+	//Vector2i se = m_camera->MapToScreen(ray.orig + (ray.dir * ray.tmax));
+	//LineSeg2Di lseg = LineSeg2Di(so,se);
 
 	//Draw the origin point as a sphere.
-	drawSprite(ray.orig, "basicSphere",DIFFUSE,sCol);
+	//drawSprite(ray.orig, "basicSphere",DIFFUSE,sCol);
 
 	//draw the projected line segment.
-	drawLine2D(lseg,rCol);
+	//drawLine2D(lseg,rCol);
 
 	
 }
 
 void dorkestRenderer::drawLine2D(LineSeg2Di line, Colorf col) {
-	//instPGE::getInstance()->setHudDraw();
-	instPGE::getInstance()->SetPixelMode(olc::Pixel::NORMAL);
-	instPGE::getInstance()->DrawLine(line.P1, line.P2, col);
-	//instPGE::getInstance()->setGameDraw();
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
+
 }
 
 void dorkestRenderer::drawLine3D(LineSeg3Df line, Colorf col) {
-	//instPGE::getInstance()->setHudDraw();
-	instPGE::getInstance()->SetPixelMode(olc::Pixel::NORMAL);
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
 
-	Vector2i p1m = this->cam->iTOc({ 32.0f,32.0f }, 1, line.P1, { 0.0f,0.0f });
-	Vector2i p2m = this->cam->iTOc({ 32.0f,32.0f }, 1, line.P2, { 0.0f,0.0f });
-
-
-	instPGE::getInstance()->DrawLine(p1m, p2m, col);
-	//instPGE::getInstance()->setGameDraw();
 }
 
 void dorkestRenderer::drawVertex(Vert v)
 {
-	
-	drawSprite(v.pos, "basicSphere", DIFFUSE, v.col, 0.250f);
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
+
+	//drawSprite(v.pos, "basicSphere", DIFFUSE, v.col, 0.250f);
 
 }
 
 void dorkestRenderer::drawTriangle(Triangle t, Colorf col)
 {
-	drawSprite(t[0].pos, "basicSphere", DIFFUSE, t[0].col);
-	drawSprite(t[1].pos, "basicSphere", DIFFUSE, t[1].col);
-	drawSprite(t[2].pos, "basicSphere", DIFFUSE, t[2].col);
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
 
-	dorkestSprite* spr = dorkestSpriteMan::getInstance()->getDorkestSprite("basicSphere");
-	
-	Vector2f qsize = (Vector2f)spr->getSpriteSize() / 4;
+	//drawSprite(t[0].pos, "basicSphere", DIFFUSE, t[0].col);
+	//drawSprite(t[1].pos, "basicSphere", DIFFUSE, t[1].col);
+	//drawSprite(t[2].pos, "basicSphere", DIFFUSE, t[2].col);
 
-	Vector2f pa = this->cam->iTOc({ 32.0f,32.0f }, 1, t[0].pos, { 0.0f,0.0f });
-	Vector2f pb = this->cam->iTOc({ 32.0f,32.0f }, 1, t[1].pos, { 0.0f,0.0f });
-	Vector2f pc = this->cam->iTOc({ 32.0f,32.0f }, 1, t[2].pos, { 0.0f,0.0f });
+	//dorkestSprite* spr = dorkestSpriteMan::getInstance()->getDorkestSprite("basicSphere");
+	//
+	//Vector2f qsize = (Vector2f)spr->getSpriteSize() / 4;
 
-	pa.y += qsize.y;
-	pb.y += qsize.y;
-	pc.y += qsize.y;
+	//Vector2f pa = this->m_camera->iTOc({ 32.0f,32.0f }, 1, t[0].pos, { 0.0f,0.0f });
+	//Vector2f pb = this->m_camera->iTOc({ 32.0f,32.0f }, 1, t[1].pos, { 0.0f,0.0f });
+	//Vector2f pc = this->m_camera->iTOc({ 32.0f,32.0f }, 1, t[2].pos, { 0.0f,0.0f });
 
-	drawLine2D(LineSeg2Di(pa, pb), Colorf(olc::RED));
-	drawLine2D(LineSeg2Di(pb, pc), Colorf(olc::RED));
-	drawLine2D(LineSeg2Di(pc, pa), Colorf(olc::RED));
+	//pa.y += qsize.y;
+	//pb.y += qsize.y;
+	//pc.y += qsize.y;
+
+	//drawLine2D(LineSeg2Di(pa, pb), Colorf(1, 0, 0, 1));
+	//drawLine2D(LineSeg2Di(pb, pc), Colorf(1, 0, 0, 1));
+	//drawLine2D(LineSeg2Di(pc, pa), Colorf(1, 0, 0, 1));
 }
 
 //Vector3d dorkestRenderer::PixelToNormal(int r, int g, int b)
@@ -210,22 +228,13 @@ void dorkestRenderer::drawTriangle(Triangle t, Colorf col)
 //	return rgb;
 //}
 
-
-
-
-bool dorkestRenderer::drawDecalINTERNAL(Vector2f dest, Vector2f destSize, olc::Decal* spr, Vector2f src, Vector2f srcSize, olc::Pixel color) {
-	instPGE::getInstance()->DrawPartialDecal(dest, destSize, spr,	src, srcSize, color);
-	return true;
-}
-
-
-bool dorkestRenderer::drawSpriteINTERNAL(Vector2f dest, int scale, olc::Sprite* spr, Vector2f src, Vector2f srcSize) {
-	instPGE::getInstance()->DrawPartialSprite(dest,	spr, src, srcSize, scale);
-	return true;
-}
-
 bool dorkestRenderer::drawToScreen(Vector2i screenPos, std::string name, sType spriteType, Colorf color, float scale, Vector2f size)
 {
+	if (m_window == nullptr) {
+		error("No window.");
+		return false;
+	}
+
 	dorkestSprite* spr = dorkestSpriteMan::getInstance()->getDorkestSprite(name);
 	if (spr == nullptr) { error("Sprite not found : " + name); return false; }
 
@@ -237,7 +246,7 @@ bool dorkestRenderer::drawToScreen(Vector2i screenPos, std::string name, sType s
 	//Get the offset for what sprite we're drawing.
 	Vector2f coord = Vector2f(spr->getSpriteCoord().x, spriteType );
 
-	scale = cam->getZoom();
+	scale = m_camera->getZoom();
 
 	//Draw the sprite from the center.
 	screenPos.x -= (size.x/2) * scale;
@@ -246,30 +255,19 @@ bool dorkestRenderer::drawToScreen(Vector2i screenPos, std::string name, sType s
 	Vector2f scaledSize = (Vector2f)size * scale;
 
 	//Prefer to draw a decal.
-	if (spr->hasDecal() && this->forceIgnoreDecalFlag == false) {		
-		instPGE::getInstance()->DrawPartialDecal(
-			screenPos,
-			scaledSize,
-			spr->getDecalSheet(),
-			coord,
-			size,
-			color);
-	} else if (spr->hasSprite()) {
-		//Otherwise, draw a sprite or error out.
+	if (spr->hasSprite()) {		
 		
-		instPGE::getInstance()->DrawPartialSprite(
-			screenPos,
-			spr->getSpriteSheet(),
-			coord,
-			size,
-			scale);
-		debug("We are drawing a sprite without a color value ----- Make sure to use decals!");
 	} else { error("Tried to draw a sprite that has neither a SPRITE based sheet, or a decal based sheet!");  return false; }
 	return true;
 }
 
 void dorkestRenderer::drawAABB3(AABB3f box, Colorf col)
 {
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
+
 	Vector3f v[8];
 	Vector3f l = box.getLocation();
 	Vector3f m = box.getMax();
@@ -317,6 +315,11 @@ void dorkestRenderer::drawAABB3(AABB3f box, Colorf col)
 
 void dorkestRenderer::drawAABB2(AABB2i box, Colorf col)
 {
+	if (m_window == nullptr) {
+		error("No window.");
+		return;
+	}
+
 	Vector2f v[4];
 	Vector2f l = box.getLocation();
 	Vector2f m = box.getMax();

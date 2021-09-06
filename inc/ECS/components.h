@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Util/Math/Vector3.h"
-#include <olcPixelGameEngine.h>
 #include "Util/Log.h"
 #include <Util/Math/Geometry/AABB.h>
 #include <Engine/World/Light.h>
@@ -94,26 +93,6 @@ public:
 
 	operator std::string& () { return spriteName; }
 	operator const std::string& () const { return spriteName; }
-
-};
-
-/// <summary>
-/// Imposter Component
-/// Stores a pre-rendered image of an entity that includes it. Controls the pointer to the imposter decal.
-/// </summary>
-struct c_imposter {
-public:
-	olc::Decal* imposter = nullptr;
-	Vector2i decalsize = { 0,0 };
-	bool init = false;
-
-	c_imposter() = default;
-	c_imposter(const c_imposter& tag) = default;
-	c_imposter(olc::Decal* imposter) : imposter(imposter) { init = true; }
-	~c_imposter() { if (imposter != nullptr) delete imposter; }
-
-	operator olc::Decal* () { return imposter; }
-	operator const olc::Decal* () const { return imposter; }
 
 };
 
